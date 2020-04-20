@@ -109,6 +109,7 @@ public class TablutRandomClient extends TablutClient {
 
 		while (true) {
 			try {
+				//Leggo dal server
 				this.read();
 			} catch (ClassNotFoundException | IOException e1) {
 				// TODO Auto-generated catch block
