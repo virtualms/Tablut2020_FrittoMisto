@@ -17,11 +17,11 @@ public class TablutFMClient extends TablutClient {
 
     private int game;
 
+    /***COSTRUTTORI***/
     public TablutFMClient(String player, String name, int gameChosen, int timeout, String ipAddress) throws UnknownHostException, IOException {
         super(player, name, timeout, ipAddress);
         game = gameChosen;
     }
-
 
     public TablutFMClient(String player) throws UnknownHostException, IOException {
         this(player, "FrittoMisto", 4, 60, "localhost");
@@ -32,10 +32,10 @@ public class TablutFMClient extends TablutClient {
     }
 
     public TablutFMClient(String player, int gameChosen) throws UnknownHostException, IOException {
-        this(player, "random", gameChosen, 60, "localhost");
+        this(player, "FrittoMisto", gameChosen, 60, "localhost");
     }
 
-
+    /***MAIN***/
     public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
         int gametype = 4;
         String role = "";
@@ -65,6 +65,7 @@ public class TablutFMClient extends TablutClient {
         client.run();
     }
 
+    /***RUN***/
     @Override
     public void run() {
 
