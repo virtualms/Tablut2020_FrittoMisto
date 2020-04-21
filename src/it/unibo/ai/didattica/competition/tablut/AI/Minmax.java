@@ -1,70 +1,80 @@
 package it.unibo.ai.didattica.competition.tablut.AI;
-import java.util.*;
+
+import java.util.concurrent.*;
 
 
-//codice da https://www.e4developer.com/2018/09/23/implementing-minimax-algorithm-in-java/
-public final class Minmax {
+public final class Minmax implements Callable<String> {
 
-    private Minmax() {}
+    //here to testing
+    //TODO: Se faccio questo campo statico, ogni istanza di Minmax, lavora sugli stessi dati, giusto?
+    // Va bene così, non statico. Right?
+    private String test_bestResult_finOra = "iniziato";
 
-    public static State minimaxDecision(State state) {
-        return state.getActions().stream()
-                .max(Comparator.comparing(Minmax::minValue)).get();
+    //TODO: Controllare, per avere conferma, che questo executor è quello più performante.
+    private ExecutorService executorService = Executors.newCachedThreadPool();
+
+//    public static Game game;
+//    protected int currDepthLimit;
+//    public State.Turn turn;
+//    boolean iterative;
+//
+//
+//    public Minmax(int currDepthLimit, State.Turn turn, boolean iterative) {
+//        this.currDepthLimit = currDepthLimit;
+//        this.turn = turn;
+//        this.iterative = iterative;
+//    }
+
+    public Minmax() {
     }
 
-    private static double maxValue(State state) {
-        if(state.isTerminal()){
-            return state.getUtility();
+
+    public String makeDecision(int timeOut) {
+
+        //metto in esecuzione il task (viene chiamata "call()")
+        Future<String> risultato = executorService.submit(this);
+
+        String result = "iniziato";
+        try {
+            result = risultato.get(timeOut, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+
+            //importante altrimenti il thread che si occupa della call() continua ad eseguire
+            risultato.cancel(true);
+
+            //Questo è il metodo che fa terminare il thread che lavora sui callable.
+            //Decommentato altrimenti non potrebbero esserci chiamate successive di questo metodo.
+            //In alternativa si potrebbe instanziare un ExecutorService ad ogni chiamata, ma per me è inutile,
+            //inoltre in questo modo si ha sempre un pool di thread pronti ad eseguire. Se venisse instanziato ogni volta,
+            //i thread verrebbero inizializzati ogni volta con perdita di prestazioni.
+            //executorService.shutdownNow();
+
+            return test_bestResult_finOra;
+
+        }catch (Exception e) {
+            e.printStackTrace();
         }
-        return state.getActions().stream()
-                .map(Minmax::minValue)
-                .max(Comparator.comparing(Double::valueOf)).get();
+        return result;
     }
 
-    private static double minValue(State state) {
-        if(state.isTerminal()){
-            return state.getUtility();
-        }
-        return state.getActions().stream()
-                .map(Minmax::maxValue)
-                .min(Comparator.comparing(Double::valueOf)).get();
-    }
-
-    public static class State {
-
-        final int state;
-        final boolean firstPlayer;
-        final boolean secondPlayer;
-
-        public State(int state, boolean firstPlayer){
-            this.state = state;
-            this.firstPlayer = firstPlayer;
-            this.secondPlayer = !firstPlayer;
-        }
-
-        Collection<State> getActions(){
-            List<State> actions = new LinkedList<>();
-            if(state > 4){
-                actions.add(new State(state-5, secondPlayer));
+    @Override
+    public String call() throws Exception {
+        long i = 0;
+        while (i != 20) {
+            i++;
+            Thread.sleep(1000);
+            System.out.println("ho dormito " + i + " secondi");
+            if (i == 5) {
+                test_bestResult_finOra = " ho superato 5 ";
             }
-            if(state > 3){
-                actions.add(new State(state-4, secondPlayer));
+            if (i == 10) {
+                test_bestResult_finOra = " ho superato 10 ";
             }
-            if(state > 2){
-                actions.add(new State(state-3, secondPlayer));
+            if (i == 15) {
+                test_bestResult_finOra = " ho superato 15 ";
             }
-            return actions;
         }
+        return test_bestResult_finOra;
 
-        boolean isTerminal() {
-            return state < 3;
-        }
-
-        double getUtility() {
-            if(firstPlayer)
-                return -1;
-            else
-                return 1;
-        }
     }
 }
