@@ -12,11 +12,9 @@ public class TestTimer {
         Minmax minmax = new Minmax();
 
         //cambiare il timeout tra 1 e 20
-        String resultTest = minmax.makeDecision(2);
+        String resultTest = minmax.makeDecision(1);
 
         System.out.println("risultato= _____" + resultTest + "_____");
-
-
     }
 
 }

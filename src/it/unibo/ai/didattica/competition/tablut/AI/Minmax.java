@@ -77,4 +77,5 @@ public final class Minmax implements Callable<String> {
         return test_bestResult_finOra;
 
     }
+
 }
