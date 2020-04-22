@@ -3,9 +3,7 @@ package it.unibo.ai.didattica.competition.tablut.AI;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
-import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -311,7 +309,7 @@ public class Utils {
                 String to = getBox(i, c.getCol());
                 res.add(new Action(from, to, turn));
             }
-            else {vec.clear(i);}
+            else {break;}
         }
 
         //vado verso giù, mi muovo su una colonna cambiando righe
@@ -322,7 +320,7 @@ public class Utils {
                 String to = getBox(k, c.getCol());
                 res.add(new Action(from, to, turn));
             }
-            else {vec.clear(k);}
+            else {break;}
         }
         //from!=to
         vec.clear(pivot);
@@ -343,7 +341,7 @@ public class Utils {
                 String to = getBox(c.getRow(), i);
                 res.add(new Action(from, to, turn));
             }
-            else {vec.clear(i);}
+            else {break;}
         }
 
         //vado verso sinistra, mi muovo su una colonna cambiando righe
@@ -354,7 +352,7 @@ public class Utils {
                 String to = getBox(c.getRow(), k);
                 res.add(new Action(from, to, turn));
             }
-            else {vec.clear(k);}
+            else {break;}
         }
         //from!=to
         vec.clear(pivot);
