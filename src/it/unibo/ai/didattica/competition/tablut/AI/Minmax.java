@@ -101,7 +101,7 @@ public final class Minmax implements Callable<Action> {
         for (Action action : game.getAllLegalActions(state)) {
             value = Math.max(value, minValue(game.checkMove(state.clone(), action), alpha, beta));
             if (value >= beta)
-                return value;
+            return value;
             alpha = Math.max(alpha, value);
         }
         return value;
