@@ -303,7 +303,7 @@ public class Utils {
 
         //vado verso su, mi muovo su una colonna cambiando righe
         for(int i=pivot+1; i<9; i++){
-            if(vec.get(i-1) && !array.get(i)) {
+            if(/*vec.get(i-1) &&*/ !array.get(i)) {
                 if(i - pivot == 8 && !place_8_steps(c)) continue; //TODO E' UNA MERDA MA SI VEDA b_map2_camp, serve ad evitare alcune mosse illegali/
                 vec.set(i);
                 String to = getBox(i, c.getCol());
@@ -314,7 +314,7 @@ public class Utils {
 
         //vado verso giù, mi muovo su una colonna cambiando righe
         for(int k=pivot-1; k>0; k--){
-            if(vec.get(k+1) && !array.get(k)) {
+            if(/*vec.get(k+1) &&*/ !array.get(k)) {
                 if(pivot - k == 8 && !place_8_steps(c)) continue; //TODO E' UNA MERDA MA SI VEDA b_map2_camp, serve ad evitare alcune mosse illegali/
                 vec.set(k);
                 String to = getBox(k, c.getCol());
@@ -335,7 +335,7 @@ public class Utils {
 
         //vado verso destra, mi muovo su una colonna cambiando righe
         for(int i=pivot+1; i<9; i++){
-            if(vec.get(i-1) && !array.get(i)) {
+            if(/*vec.get(i-1) &&*/ !array.get(i)) {
                 if(i - pivot == 8 && !place_8_steps(c)) continue; //TODO E' UNA MERDA MA SI VEDA b_map2_camp, serve ad evitare alcune mosse illegali/
                 vec.set(i);
                 String to = getBox(c.getRow(), i);
@@ -346,7 +346,7 @@ public class Utils {
 
         //vado verso sinistra, mi muovo su una colonna cambiando righe
         for(int k=pivot-1; k>0; k--){
-            if(vec.get(k+1) && !array.get(k)) {
+            if(/*vec.get(k+1) &&*/ !array.get(k)) {
                 if(pivot - k == 8 && !place_8_steps(c)) continue; //TODO E' UNA MERDA MA SI VEDA b_map2_camp, serve ad evitare alcune mosse illegali/
                 vec.set(k);
                 String to = getBox(c.getRow(), k);
