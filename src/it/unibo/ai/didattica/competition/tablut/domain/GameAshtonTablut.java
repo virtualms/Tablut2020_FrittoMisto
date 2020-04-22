@@ -201,6 +201,8 @@ public class GameAshtonTablut implements Game {
 							throw new ClimbingException(a);
 						} else {
 							this.loggGame.warning("Mossa che scavalca una pedina");
+							//TODO REMOVE THIS
+							System.out.println("		Action: from=" + a.getFrom() + " to=" + a.getTo());
 							throw new ClimbingException(a);
 						}
 					}
@@ -218,6 +220,8 @@ public class GameAshtonTablut implements Game {
 							throw new ClimbingException(a);
 						} else {
 							this.loggGame.warning("Mossa che scavalca una pedina");
+							//TODO REMOVE THIS
+							System.out.println("		Action: from=" + a.getFrom() + " to=" + a.getTo());
 							throw new ClimbingException(a);
 						}
 					}
@@ -237,6 +241,8 @@ public class GameAshtonTablut implements Game {
 							throw new ClimbingException(a);
 						} else {
 							this.loggGame.warning("Mossa che scavalca una pedina");
+							//TODO REMOVE THIS
+							System.out.println("		Action: from=" + a.getFrom() + " to=" + a.getTo());
 							throw new ClimbingException(a);
 						}
 					}
@@ -254,6 +260,8 @@ public class GameAshtonTablut implements Game {
 							throw new ClimbingException(a);
 						} else {
 							this.loggGame.warning("Mossa che scavalca una pedina");
+							//TODO REMOVE THIS
+							System.out.println("		Action: from=" + a.getFrom() + " to=" + a.getTo());
 							throw new ClimbingException(a);
 						}
 					}
