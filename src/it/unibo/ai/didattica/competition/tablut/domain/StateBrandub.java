@@ -1,6 +1,7 @@
 package it.unibo.ai.didattica.competition.tablut.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 
 /**
@@ -12,7 +13,7 @@ public class StateBrandub extends State implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 
-	public StateBrandub() 
+	public StateBrandub()
 	{
 		super();
 		this.board = new Pawn[7][7];

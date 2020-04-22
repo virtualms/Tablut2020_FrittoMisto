@@ -1,11 +1,10 @@
 package it.unibo.ai.didattica.competition.tablut.domain;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,6 +106,7 @@ public class GameAshtonTablut implements Game {
 		// this.strangeCitadels.add("e9");
 	}
 
+	//TODO: RITORNA LO STATO DOPO LA MOSSA????
 	@Override
 	public State checkMove(State state, Action a)
 			throws BoardException, ActionException, StopException, PawnException, DiagonalException, ClimbingException,
@@ -747,6 +747,80 @@ public class GameAshtonTablut implements Game {
 	@Override
 	public void endGame(State state) {
 		this.loggGame.fine("Stato:\n"+state.toString());
+	}
+
+
+	/*
+
+
+	AGGIUNTO
+
+
+
+	 */
+	//TODO: Controllare per bene la cooerenza nell'uso e nel passaggio dello stato e del turno. Possibili ottimizzazioni
+
+	private static final int COLONNE = 9;
+	private static final int RIGHE = 9;
+
+
+	public ArrayList<Action> getAllLegalActions(State state) {
+
+		ArrayList<Action> result = new ArrayList<>();
+
+		State.Pawn[][] board = state.board;
+
+		//TODO: NON PICCHIARMI, TI PREGO.
+		// è TUTTO MOMENTANEO, DOBBIAMO ANCORA DECIDERE COME RAPPRESENTARE LO STATO, QUINDI NON ARRABBARTI PER QUESTA
+		// DICHIARAZIONE
+		Map<Integer/*RIGHE*/, Map.Entry<Integer, State.Pawn>/*COLONNE*/> scacchiera = new HashMap<>();
+
+		List<int[]> pawns = new ArrayList<int[]>();
+		pawns.clear();
+		List<int[]> empty = new ArrayList<int[]>();
+		empty.clear();
+		int[] buf;
+
+		//TODO: QUALI SONO LE COLONNE E QUALI LE RIGHE? GLI ALTRI FARANNO LO STESSO?
+		for(int riga = 0; riga < RIGHE ; riga++ ){
+			for(int colonna = 0; colonna < COLONNE; colonna++){
+				buf = new int[2];
+				buf[0] = riga;
+				buf[1] = colonna;
+
+				if (board[riga][colonna] == State.Pawn.EMPTY){
+					empty.add(buf);
+				} else
+					if (
+							//TODO: QUESTA SI CHE è LEGGGGIIIBBBBILLLLEEEE
+							// ricorda che se mi uccidi vai in galera <3 <3
+							// (quando decidiamo per bene lo stato facciamo tutto bello)
+							state.turn == State.Turn.BLACK ? board[riga][colonna] == State.Pawn.BLACK : ( board[riga][colonna] == State.Pawn.WHITE || board[riga][colonna] == State.Pawn.KING)
+					){
+						pawns.add(buf);
+					}
+			}
+		}
+
+
+		//TODO: CHE SCHIFO SIGNORI
+		//PER OGNI PEDONE CONTROLLO DOVE PUO' ANDARE.
+		// MOLTO SCEMO, BASTA CONSIDERARE SOLO TUTTA LA RIGA E TUTTA LA COLONNA IN CUI SI TROVA MA CONTROLLA
+		// MA CONTROLLA TUTTE LE POSIZIONI VUOTE
+		pawns.forEach( p -> {
+			String from = state.getBox(p[0]/*RIGA*/, p[1]/*COLONNA*/);
+			empty.forEach( emp -> {
+				String to = state.getBox(emp[0], emp[1]);
+				try {
+					Action temp = new Action(from, to, state.turn);
+					checkMove(state.clone(), temp);
+					result.add(temp);
+				} catch (Exception e) {
+				}
+			});
+				}
+		);
+		 return result;
 	}
 
 

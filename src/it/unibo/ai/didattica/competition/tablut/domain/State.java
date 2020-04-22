@@ -2,6 +2,7 @@ package it.unibo.ai.didattica.competition.tablut.domain;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 
 /**
  * Abstract class for a State of a game We have a representation of the board
@@ -12,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public abstract class State {
 
-	/**
+    /**
 	 * Turn represent the player that has to move or the end of the game(A win
 	 * by a player or a draw)
 	 * 

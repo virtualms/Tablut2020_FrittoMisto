@@ -11,6 +11,8 @@ import it.unibo.ai.didattica.competition.tablut.exceptions.PawnException;
 import it.unibo.ai.didattica.competition.tablut.exceptions.StopException;
 import it.unibo.ai.didattica.competition.tablut.exceptions.ThroneException;
 
+import java.util.ArrayList;
+
 /**
  * Contains the rules of the game
  *
@@ -50,4 +52,7 @@ public interface Game {
 			ThroneException, OccupitedException, ClimbingCitadelException, CitadelException;
 
 	public void endGame(State state);
+
+    ArrayList<Action> getAllLegalActions(State state);
+
 }

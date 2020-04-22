@@ -1,14 +1,18 @@
 package it.unibo.ai.didattica.competition.tablut.domain;
 
+import com.sun.istack.internal.FinalArrayList;
+
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.*;
 
 
 /**
  * This class represents a state of a match of Tablut (classical or second
  * version)
- * 
+ *
  * @author A.Piretti
- * 
+ *
  */
 public class StateTablut extends State implements Serializable {
 
@@ -74,7 +78,7 @@ public class StateTablut extends State implements Serializable {
 		result.setTurn(this.turn);
 		return result;
 	}
-	
+
 
 	@Override
 	public boolean equals(Object obj) {

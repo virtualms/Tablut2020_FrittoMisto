@@ -9,6 +9,8 @@ import it.unibo.ai.didattica.competition.tablut.exceptions.PawnException;
 import it.unibo.ai.didattica.competition.tablut.exceptions.StopException;
 import it.unibo.ai.didattica.competition.tablut.exceptions.ThroneException;
 
+import java.util.ArrayList;
+
 /**
  * Tablut che segue le regole moderne
  *
@@ -451,6 +453,12 @@ public class GameModernTablut implements Game {
 	// TODO: Implement this
 	@Override
 	public void endGame(State state) {
+	}
+
+	//TODO: non implementato
+	@Override
+	public ArrayList<Action> getAllLegalActions(State state) {
+		return null;
 	}
 
 }

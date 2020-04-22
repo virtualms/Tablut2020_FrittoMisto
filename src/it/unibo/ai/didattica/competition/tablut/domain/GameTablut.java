@@ -1,6 +1,7 @@
 package it.unibo.ai.didattica.competition.tablut.domain;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -589,6 +590,11 @@ public class GameTablut implements Game {
 		this.loggGame.fine("Stato: "+state.toString());
 	}
 
-	
-	
+	//TODO: non implementato
+	@Override
+	public ArrayList<Action> getAllLegalActions(State state) {
+		return null;
+	}
+
+
 }

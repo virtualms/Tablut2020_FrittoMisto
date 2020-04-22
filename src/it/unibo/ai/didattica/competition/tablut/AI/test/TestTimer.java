@@ -1,7 +1,5 @@
 package it.unibo.ai.didattica.competition.tablut.AI.test;
 
-import it.unibo.ai.didattica.competition.tablut.AI.Minmax;
-
 public class TestTimer {
 
 
@@ -9,7 +7,7 @@ public class TestTimer {
     ////executorService.shutdownNow();
     public static void main(String[] args) {
 
-        Minmax minmax = new Minmax();
+        Test_BlockedTimer minmax = new Test_BlockedTimer();
 
         //cambiare il timeout tra 1 e 20
         String resultTest = minmax.makeDecision(1);
