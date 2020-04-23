@@ -7,6 +7,8 @@ import it.unibo.ai.didattica.competition.tablut.domain.State;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -52,9 +54,11 @@ public final class Minmax implements Callable<Action> {
             result = risultato.get(timeOut, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
 
-            new File("cane.txt").createNewFile();
+            //TODO COMMENTATO
+            //new File("cane.txt").createNewFile();
 
             //importante altrimenti il thread che si occupa della call() continua ad eseguire
+            //TODO ATTENZIONEEEEEE! NON SI TORNA UN RISOLTATO A VOLTE SE TIMEOUT TROPPO BASSO, BISOGNA TARARE BENE DEPTH O CAMBIARE
             risultato.cancel(true);
 
             //Questo è il metodo che fa terminare il thread che lavora sui callable.
@@ -88,6 +92,9 @@ public final class Minmax implements Callable<Action> {
 
 //        azioni = game.getAllLegalActions(currentState);
         azioni = u.getSuccessors(currentState);
+
+        //TODO FACCIO SHUFFLE O LE PARTITE SONO TUTTE UGUALI (ANDREBBE FATTO IN UTILITY, DANDO PRIORITA' ALLE MOSSE DEL RE)
+        Collections.shuffle(azioni);
 
         for (Action action : azioni) {
 

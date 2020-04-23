@@ -588,6 +588,7 @@ public class Server implements Runnable {
 
 			// APPLY MOVE
 			// translate the string into an action object
+			System.out.println("GSON: " + theGson); //TODO AGGIUNTO PERCHE' A VOLTE NON CAPISCO CHE SUCCEDE
 			move = this.gson.fromJson(theGson, Action.class);
 			loggSys.fine("Move received.\t" + move.toString());
 			move.setTurn(state.getTurn());

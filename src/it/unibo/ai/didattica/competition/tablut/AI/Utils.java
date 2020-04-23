@@ -3,7 +3,6 @@ package it.unibo.ai.didattica.competition.tablut.AI;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
-import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
 import java.io.IOException;
 import java.util.*;
