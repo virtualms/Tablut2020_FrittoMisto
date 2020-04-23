@@ -9,42 +9,44 @@ public class TestUtils {
 
     public static void main(String[] args) {
         System.out.println("Testing...");
-        Utils u = new Utils();
+        Utils u = new Utils(false);
         State state = new StateTablut();
-        //state.removePawn(8, 3);
+
+
+
         Game game = new GameAshtonTablut(state.clone(), 0, -1, "logs", "W", "B");
 
-        long start, end, delay;
+        long start, end, delay1, delay2;
 
         /***pivoting***/
 
         start = System.currentTimeMillis();
-        u.getSuccessorFirstLv_proto(state);
-        List<Action> mine = u.getA();
+        List<Action> l = u.getSuccessors(state);
         end = System.currentTimeMillis();
 
-        delay = end - start;
-        System.out.println("PIVOTING___Done in " + delay + ". Count " + u.getA().size());
 
+        delay1 = end - start;
+        System.out.println("PIVOTING___Done in " + delay1 + ". Count " + l.size());
 
         //TODO BOIAAAAAAAAAAAAAA FUNZIONA
 
         /****************Arcangelo**********/
 
-
+    /*
         start = System.currentTimeMillis();
         List<Action> their = u.getAllLegalActions(game);
         end = System.currentTimeMillis();
 
-        delay = end - start;
-        //System.out.println("ARCANGELO___Done in " + delay + ". Count " + l.size());
+        delay2 = end - start;
+        System.out.println("PIVOTING___Done in " + delay1 + ". Count " + u.getA().size());
+        System.out.println("ARCANGELO___Done in " + delay2 + ". Count " + their.size());
 
-        System.out.println("\n\n\nDIFF\n\n" + "their_l=" + their.size() + ", mine=" + mine.size());
+        System.out.println("\n\n\nDIFF\n\n" + "their_l=" + their.size() + ", mine=" + u.getA().size());
         for(Action a : their){
-            if(!mine.contains(a))
+            if(!u.getA().contains(a))
                 System.out.println("NOT FOUND: from=" + a.getFrom() +", to=" + a.getTo());
         }
-
+*/
 /*
 
         Game game = new GameAshtonTablut(state.clone(), 0, -1, "logs", "W", "B");

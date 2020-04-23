@@ -7,6 +7,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.State;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 
@@ -72,19 +73,25 @@ public final class Minmax implements Callable<Action> {
         return result;
     }
 
+    //TODO BRUTTOOOOOOOOOOOOOO
+    private Utils u = new Utils(true);
+
     @Override
     public Action call() throws Exception {
         result = null;
         double resultValue = Double.NEGATIVE_INFINITY;
 
         //TODO: Collection più performante?
-        ArrayList<Action> azioni = null;
+        List<Action> azioni = null;
 
-        azioni = game.getAllLegalActions(currentState);
+        //TODO: TESTING Utils
+
+//        azioni = game.getAllLegalActions(currentState);
+        azioni = u.getSuccessors(currentState);
 
         for (Action action : azioni) {
 
-            double value = minValue(game.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+            double value = minValue(game.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
             if (value > resultValue) {
                 result = action;
                 resultValue = value;
@@ -93,13 +100,13 @@ public final class Minmax implements Callable<Action> {
         return result;
     }
 
-    public double maxValue(State state, double alpha, double beta) throws Exception{
-        if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN)
+    public double maxValue(State state, double alpha, double beta, int depth) throws Exception{
+        if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
             return Heuristic.eval(state, player);
         double value = Double.NEGATIVE_INFINITY;
         //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
-        for (Action action : game.getAllLegalActions(state)) {
-            value = Math.max(value, minValue(game.checkMove(state.clone(), action), alpha, beta));
+        for (Action action : /*game.getAllLegalActions(state)*/u.getSuccessors(state)) {
+            value = Math.max(value, minValue(game.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value >= beta)
             return value;
             alpha = Math.max(alpha, value);
@@ -107,13 +114,13 @@ public final class Minmax implements Callable<Action> {
         return value;
     }
 
-    public double minValue(State state, double alpha, double beta) throws Exception{
-        if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN)
+    public double minValue(State state, double alpha, double beta, int depth) throws Exception{
+        if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
             return Heuristic.eval(state, player);
         double value = Double.POSITIVE_INFINITY;
         //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
-        for (Action action : game.getAllLegalActions(state)) {
-            value = Math.min(value, maxValue(game.checkMove(state.clone(), action), alpha, beta));
+        for (Action action : /*game.getAllLegalActions(state)*/u.getSuccessors(state)) {
+            value = Math.min(value, maxValue(game.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value <= alpha)
                 return value;
             beta = Math.min(beta, value);

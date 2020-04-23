@@ -65,7 +65,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 	public void run() {
 		System.out.println("You are player " + this.getPlayer().toString() + "!");
 		Action action;
-		Minmax minmax = new Minmax(game, 100, getPlayer(), true);
+		Minmax minmax = new Minmax(game, 2, getPlayer(), true);
 
 		try {
 			this.declareName();
