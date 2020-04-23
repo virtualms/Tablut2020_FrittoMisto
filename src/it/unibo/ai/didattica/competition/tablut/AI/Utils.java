@@ -62,7 +62,7 @@ public class Utils {
     }
 
     /******CREAZIONE BIT-MAP******/
-    public byte[][] w_map1(State state, List<Coord> whitePieces) {
+    public byte[][] w_map(State state, List<Coord> whitePieces) {
         //WHITE: w-map1 -->ciclo sullo stato, se incontro un pedone o campo/castello metto un 1 altrimenti uno 0
         State.Pawn[][] board = state.getBoard();
         byte[][] bytes = new byte[9][9];
@@ -189,7 +189,7 @@ public class Utils {
 
         /***white***/
         if (state.getTurn().equals(State.Turn.WHITE)) {
-            table = w_map1(state, whitePieces);
+            table = w_map(state, whitePieces);
             if(!suppressPrint) printboard(table);
 
             for(Coord c : whitePieces){
