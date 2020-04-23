@@ -3,12 +3,8 @@ package it.unibo.ai.didattica.competition.tablut.AI;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
-import it.unibo.ai.didattica.competition.tablut.exceptions.*;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
@@ -22,6 +18,7 @@ public final class Minmax implements Callable<Action> {
     public static Game game;
     protected int currDepthLimit;
     private State.Turn player;
+    private Utils u = null;
 
     //TODO: è per limitare, eventualmente, la ricerca soltanto al primo livello
     private boolean iterative;
@@ -37,7 +34,7 @@ public final class Minmax implements Callable<Action> {
         this.currDepthLimit = currDepthLimit;
         this.player = player;
         this.iterative = iterative;
-
+        this.u = new Utils(true);
     }
 
     public Action makeDecision(int timeOut, State stato) throws IOException {
@@ -78,8 +75,6 @@ public final class Minmax implements Callable<Action> {
         return result;
     }
 
-    //TODO BRUTTOOOOOOOOOOOOOO
-    private Utils u = new Utils(true);
 
     @Override
     public Action call() throws Exception {
