@@ -3,6 +3,7 @@ package it.unibo.ai.didattica.competition.tablut.AI;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
+import it.unibo.ai.didattica.competition.tablut.exceptions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,15 +30,15 @@ public final class Minmax implements Callable<Action> {
     private State currentState;
     private Action result;
 
-    //TODO: Questa versione non ha il limite di profondità.
+
 //     Può essere inserito oppure no, vediamo come si comporta il timeout
     public Minmax(Game game, int currDepthLimit, State.Turn player, boolean iterative) {
         this.game = game;
         this.currDepthLimit = currDepthLimit;
         this.player = player;
         this.iterative = iterative;
-    }
 
+    }
 
     public Action makeDecision(int timeOut, State stato) throws IOException {
 
@@ -98,7 +99,10 @@ public final class Minmax implements Callable<Action> {
 
         for (Action action : azioni) {
 
-            double value = minValue(game.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
+            //double value = minValue(game.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
+            //TODO CHECKMOVE HA ROTTO LA MINCHIA
+            double value = minValue(this.movePawn(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
+
             if (value > resultValue) {
                 result = action;
                 resultValue = value;
@@ -113,7 +117,9 @@ public final class Minmax implements Callable<Action> {
         double value = Double.NEGATIVE_INFINITY;
         //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
         for (Action action : /*game.getAllLegalActions(state)*/u.getSuccessors(state)) {
-            value = Math.max(value, minValue(game.checkMove(state.clone(), action), alpha, beta, depth + 1));
+
+            //TODO LA CHECK MI HA ROTTO IL CAZZO
+            value = Math.max(value, minValue(this.movePawn(currentState.clone(), action), alpha, beta, depth + 1));
             if (value >= beta)
             return value;
             alpha = Math.max(alpha, value);
@@ -127,7 +133,9 @@ public final class Minmax implements Callable<Action> {
         double value = Double.POSITIVE_INFINITY;
         //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
         for (Action action : /*game.getAllLegalActions(state)*/u.getSuccessors(state)) {
-            value = Math.min(value, maxValue(game.checkMove(state.clone(), action), alpha, beta, depth + 1));
+
+            //TODO LA CHECK MI HA ROTTO IL CAZZO
+            value = Math.min(value, maxValue(this.movePawn(currentState.clone(), action), alpha, beta, depth + 1));
             if (value <= alpha)
                 return value;
             beta = Math.min(beta, value);
@@ -135,4 +143,31 @@ public final class Minmax implements Callable<Action> {
         return value;
     }
 
+
+
+    /***********************++CHECK NON ROMPI CAZZO++**************************************/
+    private State movePawn(State state, Action a) {
+        State.Pawn pawn = state.getPawn(a.getRowFrom(), a.getColumnFrom());
+        State.Pawn[][] newBoard = state.getBoard();
+        // State newState = new State();
+        // libero il trono o una casella qualunque
+        if (a.getColumnFrom() == 4 && a.getRowFrom() == 4) {
+            newBoard[a.getRowFrom()][a.getColumnFrom()] = State.Pawn.THRONE;
+        } else {
+            newBoard[a.getRowFrom()][a.getColumnFrom()] = State.Pawn.EMPTY;
+        }
+
+        // metto nel nuovo tabellone la pedina mossa
+        newBoard[a.getRowTo()][a.getColumnTo()] = pawn;
+        // aggiorno il tabellone
+        state.setBoard(newBoard);
+        // cambio il turno
+        if (state.getTurn().equalsTurn(State.Turn.WHITE.toString())) {
+            state.setTurn(State.Turn.BLACK);
+        } else {
+            state.setTurn(State.Turn.WHITE);
+        }
+
+        return state;
+    }
 }

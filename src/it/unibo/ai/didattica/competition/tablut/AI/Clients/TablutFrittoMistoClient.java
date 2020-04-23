@@ -19,7 +19,8 @@ import java.net.UnknownHostException;
  */
 public class TablutFrittoMistoClient extends TablutClient {
 
-	private final int timeOut = 10;
+	private final int timeOut = 30;
+	private final int currDepthLimit = 3;
 	private Game game;
 
 //	TODO: Presi dal random. Eventualmente da sistemare
@@ -64,7 +65,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 	public void run() {
 		System.out.println("You are player " + this.getPlayer().toString() + "!");
 		Action action;
-		Minmax minmax = new Minmax(game, 2, getPlayer(), true);
+		Minmax minmax = new Minmax(game, currDepthLimit, getPlayer(), true);
 
 		try {
 			this.declareName();
