@@ -14,9 +14,11 @@ public class Utils {
     //TODO Miglioramenti: tutti array di boolean se java puro.
 
     private boolean suppressPrint;
+    private Coord kingCord;
 
     public Utils(boolean suppressPrint){
         this.suppressPrint = suppressPrint;
+        this.kingCord = new Coord(4, 4);
     }
 
     public boolean isSuppressPrint() {
@@ -78,6 +80,12 @@ public class Utils {
                     //mentre ciclo salvo le coordinate (utile classe ausiliaria coord) di tutti i pezzi del mio colore che incontro
                     if (board[r][c].equals(State.Pawn.WHITE) || board[r][c].equals(State.Pawn.KING))
                         whitePieces.add(new Coord(r, c));
+                    //AGGIUNTA COORDINATA DEL RE
+                    if(board[r][c].equals(State.Pawn.KING)) {
+                        kingCord.setRow(r);
+                        kingCord.setCol(c);
+                    }
+
                 }
             }
         }
@@ -178,7 +186,7 @@ public class Utils {
 
     public List<Action> getSuccessors(State state) {
 
-        //Coordinate dei pazzi e azioni da restituire
+        //Coordinate dei pezzi e azioni da restituire
         List<Coord> whitePieces = new ArrayList<>();
         List<Coord> blackPieces = new ArrayList<>();
         List<Action> possibleActions = new LinkedList<>();
@@ -194,7 +202,13 @@ public class Utils {
 
             for(Coord c : whitePieces){
                 try {
-                    possibleActions.addAll(pivoting(c, table, state.getTurn()));
+
+                    //TODO ESPLORO PRIMA LE MOSSE DEL RE, HA SENSO?
+//                    if(kingCord.equals(c))
+//                        possibleActions.addAll(0, pivoting(c, table, state.getTurn()));
+//                    else
+                        possibleActions.addAll(pivoting(c, table, state.getTurn()));
+
                 }
                 catch (Exception e){
                     System.out.println(e.getStackTrace());
@@ -231,14 +245,6 @@ public class Utils {
                 }
             }
         }
-
-
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
 
         return possibleActions;
     }

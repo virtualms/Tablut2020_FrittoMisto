@@ -19,9 +19,10 @@ import java.net.UnknownHostException;
  */
 public class TablutFrittoMistoClient extends TablutClient {
 
-	private final int timeOut = 50;
+	private final int timeOut = 58;
 	private final int currDepthLimit = 3;
 	private Game game;
+	private static final String NAME = "FrittoMisto";
 
 //	TODO: Presi dal random. Eventualmente da sistemare
 //	public TablutFrittoMistoClient(String player, String name, int gameChosen, int timeout, String ipAddress) throws UnknownHostException, IOException {
@@ -43,7 +44,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 
 
 	public TablutFrittoMistoClient(String player) throws IOException {
-		super(player, "FrittoMisto");
+		super(player, NAME);
 		this.game = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
 	}
 
@@ -84,7 +85,6 @@ public class TablutFrittoMistoClient extends TablutClient {
 					if (this.getCurrentState().getTurn().equals(Turn.WHITE)) {
 
 						/*****AGGIUNTE*****/
-						//timeOut = 50;
 						action = minmax.makeDecision(timeOut, getCurrentState());
 
 
