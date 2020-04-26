@@ -9,7 +9,7 @@ public class TestUtils {
 
     public static void main(String[] args) {
         System.out.println("Testing...");
-        Utils u = new Utils(false);
+        Utils u = new Utils(true);
         State state = new StateTablut();
 
 
@@ -57,12 +57,11 @@ public class TestUtils {
         System.out.println("OTHER___Done in " + delay + ". Count " + l.size());
 */
 
-/*
 
-        for(Action a: u.getA()){
+
+        for(Action a: u.getSuccessors(state)){
             try {
-                //game.checkMove(state.clone(), a);
-                System.out.println("Found from="+ a.getFrom() +" ,to=" +a.getTo());
+                game.checkMove(state.clone(), a);
             }
 
             catch(Exception e){
@@ -70,7 +69,10 @@ public class TestUtils {
             }
         }
 
-*/
+        delay2 = System.currentTimeMillis() - start;
+        System.out.println("Delay " + delay2);
+
+
     }
 
 

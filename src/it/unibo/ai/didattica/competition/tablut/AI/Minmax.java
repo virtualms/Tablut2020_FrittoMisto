@@ -103,20 +103,15 @@ public final class Minmax implements Callable<Action> {
 
         //TODO: Collection più performante?
         List<Action> azioni = null;
-
-        //TODO: TESTING Utils
-
-//        azioni = game.getAllLegalActions(currentState);
+//      azioni = game.getAllLegalActions(currentState);
         azioni = u.getSuccessors(currentState);
 
-        //TODO FACCIO SHUFFLE O LE PARTITE SONO TUTTE UGUALI (ANDREBBE FATTO IN UTILITY, DANDO PRIORITA' ALLE MOSSE DEL RE)
+        //TODO FACCIO SHUFFLE O LE PARTITE SONO TUTTE UGUALI (ANDREBBE FATTO IN UTILITY, DANDO PRIORITA' ALLE MOSSE DEL RE (?))
         Collections.shuffle(azioni);
         result = azioni.get(0); //INIZIALIZZO RESULT CON UNA MOSSA A CASO
 
         for (Action action : azioni) {
 
-            //double value = minValue(game.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
-            //TODO CHECKMOVE HA ROTTO LA MINCHIA
             double value = minValue(this.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
 
             if (value > resultValue) {
@@ -130,11 +125,11 @@ public final class Minmax implements Callable<Action> {
     public double maxValue(State state, double alpha, double beta, int depth) throws Exception{
         if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
             return Heuristic.eval(state, player);
+
         double value = Double.NEGATIVE_INFINITY;
         //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
-        for (Action action : /*game.getAllLegalActions(state)*/u.getSuccessors(state)) {
+        for (Action action : u.getSuccessors(state)) {
 
-            //TODO LA CHECK MI HA ROTTO IL CAZZO
             value = Math.max(value, minValue(this.checkMove(currentState.clone(), action), alpha, beta, depth + 1));
             if (value >= beta)
                 return value;
@@ -146,11 +141,11 @@ public final class Minmax implements Callable<Action> {
     public double minValue(State state, double alpha, double beta, int depth) throws Exception{
         if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
             return Heuristic.eval(state, player);
+
         double value = Double.POSITIVE_INFINITY;
         //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
-        for (Action action : /*game.getAllLegalActions(state)*/u.getSuccessors(state)) {
+        for (Action action : u.getSuccessors(state)) {
 
-            //TODO LA CHECK MI HA ROTTO IL CAZZO
             value = Math.min(value, maxValue(this.checkMove(currentState.clone(), action), alpha, beta, depth + 1));
             if (value <= alpha)
                 return value;
@@ -379,7 +374,7 @@ public final class Minmax implements Callable<Action> {
         // ho il re sotto
         if (a.getRowTo() < state.getBoard().length - 2
                 && state.getPawn(a.getRowTo() + 1, a.getColumnTo()).equalsPawn("K")) {
-            System.out.println("Ho il re sotto");
+            //System.out.println("Ho il re sotto");
             // re sul trono
             if (state.getBox(a.getRowTo() + 1, a.getColumnTo()).equals("e5")) {
                 if (state.getPawn(5, 4).equalsPawn("B") && state.getPawn(4, 5).equalsPawn("B")

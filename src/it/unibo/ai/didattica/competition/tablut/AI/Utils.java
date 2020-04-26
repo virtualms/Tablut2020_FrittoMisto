@@ -11,7 +11,7 @@ import java.util.List;
 public class Utils {
 
 
-    //TODO Miglioramenti: tutti array di boolean se java puro.
+    //TODO Miglioramenti: tutti array di boolean o byte se java puro.
 
     private boolean suppressPrint;
     private Coord kingCord;
@@ -148,6 +148,7 @@ public class Utils {
 
         int r, c;
         for (r = 0; r < 9; r++) {
+
             for (c = 0; c < 9; c++) {
                 if (board[r][c].equals(State.Pawn.EMPTY) /*&& !isCamp(r, c)*/ && !isCastle(r, c)) {
                     bytes[1][r][c] = 0;
@@ -161,18 +162,13 @@ public class Utils {
                     bytes[0][r][c] = 1;
 
                     if(board[r][c].equals(State.Pawn.BLACK))  blackPieces.add(new Coord(r, c));
-                    //già fatto
-                    //if(/*state.getTurn().equals(State.Turn.WHITE) &&*/ board[r][c].equals("B"))
-                    //    whitePieces.add(new Coord(r,c));
                 }
             }
+
         }
 
         return bytes;
     }
-
-
-
 
     public void printboard( byte[][] a){
         for (int i=0; i<9; i++){
@@ -220,13 +216,7 @@ public class Utils {
 
         /***black***/
         else {
-            //COMPATTATE
-            /*
-            table_camp = b_map2_camp(state);
-            table = b_map1(state);
-             */
 
-            /***MODIFICA***/
             byte [][][] bytes = b_map(state, blackPieces);
             table = bytes[0];
             table_camp = bytes[1];
@@ -286,6 +276,10 @@ public class Utils {
     }
 
     //Ritorna l'insieme delle mosse possibili per il pedone in posizione Coord c
+    /** Ottimizzazione possibile(ma poco leggibile): non usare BitSet ausiliari ma maneggiare sempre e solo table[][]
+     * si risparmia memoria. Eliminabile anche il BitSet vec (solo per degug)
+    */
+
     private List<Action> pivoting(Coord c, byte[][] table, State.Turn turn) throws IOException {
 
         List<Action> res = new LinkedList<>();
@@ -294,6 +288,7 @@ public class Utils {
         int pivot = -1;
 
         /*****column*****/
+        //table[i][c.getCol()]
         array = getColumn(table, c.getCol());
         String from = getBox(c.getRow(), c.getCol());
 
@@ -302,7 +297,7 @@ public class Utils {
 
         //scorro la colonna verso su, mi muovo su una colonna cambiando righe
         for(int i=pivot+1; i<9; i++){
-            if(!array.get(i)) {
+            if(!array.get(i)) { //table[i][c.getCol()] == 0
                 if(i - pivot == 8 && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(i);
                 String to = getBox(i, c.getCol());
@@ -313,7 +308,7 @@ public class Utils {
 
         //vado verso giù, mi muovo su una colonna cambiando righe
         for(int k=pivot-1; k>=0; k--){
-            if(!array.get(k)) {
+            if(!array.get(k)) { //table[k][c.getCol()] == 0
                 if(pivot - k == 8 && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(k);
                 String to = getBox(k, c.getCol());
@@ -328,6 +323,7 @@ public class Utils {
         if(!suppressPrint) System.out.println("Col_VEC: " + vec.toString() +", for pawn " + getBox(c.getRow(), c.getCol()));
 
         /*****row****/
+        //array[index][i]
         array = getRow(table, c.getRow());
         pivot = c.getCol();
 
@@ -336,7 +332,7 @@ public class Utils {
 
         //vado verso destra sulla riga, mi muovo su una riga cambiando righe
         for(int i=pivot+1; i<9; i++){
-            if(!array.get(i)) {
+            if(!array.get(i)) { //table[c.getRow()][i] == 0
                 if(i - pivot == 8 && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(i);
                 String to = getBox(c.getRow(), i);
@@ -347,7 +343,7 @@ public class Utils {
 
         //vado verso sinistra
         for(int k=pivot-1; k>=0; k--){
-            if(!array.get(k)) {
+            if(!array.get(k)) { //table[c.getRow()][k] == 0
                 if((pivot - k == 8) && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(k);
                 String to = getBox(c.getRow(), k);
@@ -363,34 +359,6 @@ public class Utils {
 
         return res;
     }
-
-    //presa da state
-    public State movePawn(Game game, State state, Action a) throws Exception{
-        game.checkMove(state.clone(), a); //aggiunta
-        State.Pawn pawn = state.getPawn(a.getRowFrom(), a.getColumnFrom());
-        State.Pawn[][] newBoard = state.getBoard();
-        // State newState = new State();
-        // libero il trono o una casella qualunque
-        if (a.getColumnFrom() == 4 && a.getRowFrom() == 4) {
-            newBoard[a.getRowFrom()][a.getColumnFrom()] = State.Pawn.THRONE;
-        } else {
-            newBoard[a.getRowFrom()][a.getColumnFrom()] = State.Pawn.EMPTY;
-        }
-
-        // metto nel nuovo tabellone la pedina mossa
-        newBoard[a.getRowTo()][a.getColumnTo()] = pawn;
-        // aggiorno il tabellone
-        state.setBoard(newBoard);
-        // cambio il turno
-        if (state.getTurn().equalsTurn(State.Turn.WHITE.toString())) {
-            state.setTurn(State.Turn.BLACK);
-        } else {
-            state.setTurn(State.Turn.WHITE);
-        }
-
-        return state;
-    }
-
 
 
 
