@@ -1,7 +1,6 @@
 package it.unibo.ai.didattica.competition.tablut.AI;
 
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
-import it.unibo.ai.didattica.competition.tablut.domain.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 
 import java.io.IOException;
@@ -21,6 +20,7 @@ public class Utils {
         this.kingCord = new Coord(4, 4);
     }
 
+    /*****get-set****/
     public boolean isSuppressPrint() {
         return suppressPrint;
     }
@@ -29,14 +29,13 @@ public class Utils {
         this.suppressPrint = suppressPrint;
     }
 
-    /******************Ausiliari*********************/
-    //liste da inserire sopra, clean a ogni interazione
-    /*
-    private List<Coord> whitePieces = new ArrayList<>();
-    private List<Coord> blackPieces = new ArrayList<>();
-    private List<Action> possibleActions = new LinkedList<>();
-    */
+    public Coord getKingCord() {
+        return kingCord;
+    }
 
+    public void setKingCord(Coord kingCord) {
+        this.kingCord = kingCord;
+    }
 
 
     /******CAMP OR KING********/
@@ -74,18 +73,18 @@ public class Utils {
             for (c = 0; c < 9; c++) {
                 if (board[r][c].equals(State.Pawn.EMPTY) && !isCamp(r, c) && !isCastle(r, c))
                     bytes[r][c] = 0;
+
                 else {
                     bytes[r][c] = 1;
-
-                    //mentre ciclo salvo le coordinate (utile classe ausiliaria coord) di tutti i pezzi del mio colore che incontro
-                    if (board[r][c].equals(State.Pawn.WHITE) || board[r][c].equals(State.Pawn.KING))
-                        whitePieces.add(new Coord(r, c));
                     //AGGIUNTA COORDINATA DEL RE
                     if(board[r][c].equals(State.Pawn.KING)) {
                         kingCord.setRow(r);
                         kingCord.setCol(c);
                     }
 
+                    //mentre ciclo salvo le coordinate (utile classe ausiliaria coord) di tutti i pezzi del mio colore che incontro
+                    if (board[r][c].equals(State.Pawn.WHITE) || board[r][c].equals(State.Pawn.KING))
+                        whitePieces.add(new Coord(r, c));
                 }
             }
         }
@@ -148,7 +147,6 @@ public class Utils {
 
         int r, c;
         for (r = 0; r < 9; r++) {
-
             for (c = 0; c < 9; c++) {
                 if (board[r][c].equals(State.Pawn.EMPTY) /*&& !isCamp(r, c)*/ && !isCastle(r, c)) {
                     bytes[1][r][c] = 0;
@@ -161,16 +159,22 @@ public class Utils {
                     bytes[1][r][c] = 1;
                     bytes[0][r][c] = 1;
 
-                    if(board[r][c].equals(State.Pawn.BLACK))  blackPieces.add(new Coord(r, c));
-                }
-            }
+                    //where is King?
+                    if(board[r][c].equals(State.Pawn.KING)) {
+                        kingCord.setRow(r);
+                        kingCord.setCol(c);
+                    }
 
-        }
+                    if(board[r][c].equals(State.Pawn.BLACK))
+                        blackPieces.add(new Coord(r, c));
+                }//else
+            }//for
+        }//for
 
         return bytes;
     }
 
-    public void printboard( byte[][] a){
+    public void printboard(byte[][] a){
         for (int i=0; i<9; i++){
             for (int k=0; k<9; k++){
                 System.out.print(a[i][k] + "  ");
@@ -182,9 +186,10 @@ public class Utils {
 
     public List<Action> getSuccessors(State state) {
 
-        //Coordinate dei pezzi e azioni da restituire
+        //Coordinate dei pezzi
         List<Coord> whitePieces = new ArrayList<>();
         List<Coord> blackPieces = new ArrayList<>();
+        //risultato
         List<Action> possibleActions = new LinkedList<>();
 
         //bitmap del campo per le azioni lecite
@@ -276,28 +281,23 @@ public class Utils {
     }
 
     //Ritorna l'insieme delle mosse possibili per il pedone in posizione Coord c
-    /** Ottimizzazione possibile(ma poco leggibile): non usare BitSet ausiliari ma maneggiare sempre e solo table[][]
-     * si risparmia memoria. Eliminabile anche il BitSet vec (solo per degug)
-    */
-
     private List<Action> pivoting(Coord c, byte[][] table, State.Turn turn) throws IOException {
 
         List<Action> res = new LinkedList<>();
-        BitSet array = null; //vettore originale
+        //BitSet array = null; //vettore originale
         BitSet vec = new BitSet(9); //vettore posizioni ammissibili, usato per debug
         int pivot = -1;
 
         /*****column*****/
-        //table[i][c.getCol()]
-        array = getColumn(table, c.getCol());
+        //array = getColumn(table, c.getCol()); --> table[i][c.getCol()]
         String from = getBox(c.getRow(), c.getCol());
 
         pivot = c.getRow(); //pezzo da muovere
-        //vec.set(pivot); //IMPORTANTE PER IL PRIMO CASO
+        //vec.set(pivot); //posizione pezzo
 
         //scorro la colonna verso su, mi muovo su una colonna cambiando righe
         for(int i=pivot+1; i<9; i++){
-            if(!array.get(i)) { //table[i][c.getCol()] == 0
+            if(/*!array.get(i)*/ table[i][c.getCol()] == 0) { //table[i][c.getCol()] == 0
                 if(i - pivot == 8 && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(i);
                 String to = getBox(i, c.getCol());
@@ -308,7 +308,7 @@ public class Utils {
 
         //vado verso giù, mi muovo su una colonna cambiando righe
         for(int k=pivot-1; k>=0; k--){
-            if(!array.get(k)) { //table[k][c.getCol()] == 0
+            if(/*!array.get(k)*/table[k][c.getCol()] == 0) { //table[k][c.getCol()] == 0
                 if(pivot - k == 8 && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(k);
                 String to = getBox(k, c.getCol());
@@ -323,8 +323,7 @@ public class Utils {
         if(!suppressPrint) System.out.println("Col_VEC: " + vec.toString() +", for pawn " + getBox(c.getRow(), c.getCol()));
 
         /*****row****/
-        //array[index][i]
-        array = getRow(table, c.getRow());
+        //array = getRow(table, c.getRow()); --> array[index][i]
         pivot = c.getCol();
 
         vec.clear();
@@ -332,7 +331,7 @@ public class Utils {
 
         //vado verso destra sulla riga, mi muovo su una riga cambiando righe
         for(int i=pivot+1; i<9; i++){
-            if(!array.get(i)) { //table[c.getRow()][i] == 0
+            if(/*!array.get(i)*/table[c.getRow()][i] == 0) { //table[c.getRow()][i] == 0
                 if(i - pivot == 8 && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(i);
                 String to = getBox(c.getRow(), i);
@@ -343,7 +342,7 @@ public class Utils {
 
         //vado verso sinistra
         for(int k=pivot-1; k>=0; k--){
-            if(!array.get(k)) { //table[c.getRow()][k] == 0
+            if(/*!array.get(k)*/table[c.getRow()][k] == 0) { //table[c.getRow()][k] == 0
                 if((pivot - k == 8) && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(k);
                 String to = getBox(c.getRow(), k);
@@ -359,130 +358,4 @@ public class Utils {
 
         return res;
     }
-
-
-
-    /**********************************************************************************************/
-    /*************************************ARCANGELO************************************************/
-    /*********************************************************************************************/
-//
-//
-//    private State state = new StateTablut();
-//    private State.Pawn[][] board = state.getBoard();
-//    private Coord kingCoord = new Coord(4,4);
-//    private ArrayList<Coord> whiteCoords = null;
-//    private ArrayList<Coord> blackCoords = null;
-//
-//    public void updateCoords() {
-//        int i = 0;
-//        int j = 0;
-//        boolean king = false;
-//        ArrayList<Coord> tmpWhiteCoords = new ArrayList<Coord>();
-//        ArrayList<Coord> tmpBlackCoords = new ArrayList<Coord>();
-//
-//        for (i = 0; i < board.length; i++) {
-//            for (j = 0; j < board.length; j++) {
-//                if (this.board[i][j] == State.Pawn.WHITE)
-//                    tmpWhiteCoords.add(new Coord(i,j));
-//                if (this.board[i][j] == State.Pawn.BLACK)
-//                    tmpBlackCoords.add(new Coord(i,j));
-//                if (this.board[i][j] == State.Pawn.KING) {
-//                    this.kingCoord = new Coord(i,j);
-//                    king = true;
-//                }
-//            }
-//        }
-//        //this.whitePieces = tmpWhiteCoords.size();
-//        //this.blackPieces = tmpBlackCoords.size();
-//        //if (king)
-//        //    this.whitePieces++;
-//        this.whiteCoords = tmpWhiteCoords;
-//        this.blackCoords = tmpBlackCoords;
-//
-//    }
-//
-//    public ArrayList<Coord> getPlayerCoordSet()
-//    {
-//        //TODO REMOVE
-//        updateCoords();
-//        state.removePawn(0, 3);
-//        state.removePawn(4, 3);
-//        state.removePawn(4, 7);
-//        state.removePawn(4, 8);
-//
-//        if (this.state.equals(StateTablut.Turn.WHITE))
-//            return whiteCoords;
-//        else
-//            return blackCoords;
-//    }
-//
-//    public ArrayList<Action> getAllLegalActions(Game rules)
-//    {
-////    	System.out.println("Controllo azione");
-//
-//        ArrayList<Action> allActions = new ArrayList<>();
-////        System.out.println("Insieme di coordinate: " + getPlayerCoordSet().size());
-////        System.out.println(getPlayerCoordSet());
-//        for (Coord pos : getPlayerCoordSet()) {
-//            allActions.addAll(getLegalMovesForPosition(rules, pos));
-//        }
-//        return allActions;
-//    }
-//
-//    public ArrayList<Action> getLegalMovesForPosition(Game rules, Coord coord)
-//    {
-//        ArrayList<Action> legalMoves = new ArrayList<>();
-//
-//        legalMoves.addAll(getLegalMovesInDirection(rules, coord, -1, 0));
-//        legalMoves.addAll(getLegalMovesInDirection(rules, coord, 1, 0));
-//        legalMoves.addAll(getLegalMovesInDirection(rules, coord, 0, -1));
-//        legalMoves.addAll(getLegalMovesInDirection(rules, coord, 0, 1));
-//
-//        return legalMoves;
-//    }
-//
-//    /**
-//     * This method checks all the possible actions of a given position in a given direction in order to validate them
-//     *
-//     * @param rules 	rules to be taken into account in evaluating actions
-//     * @param coord 	the position from which you want to evaluate all the possible actions
-//     * @param x 		horizontal direction
-//     * @param y 		vertical direction
-//     * @return all the possible actions in the given position and direction
-//     */
-//    public ArrayList<Action> getLegalMovesInDirection(Game rules, Coord coord, int x, int y)
-//    {
-//        boolean legal = false;
-//        ArrayList<Action> legalMovesInDir = new ArrayList<>();
-//        assert (!(x != 0 && y != 0));
-//        int startPos = (x != 0) ? coord.getRow() : coord.getCol(); // starting at x or y
-//        int incr = (x != 0) ? x : y; // incrementing the x or y value
-//        int endIdx = (incr == 1) ? board.length - 1 : 0; // moving in the 0 or 8 direction
-//
-//        // for each possible move creates an action an verify its legality
-//        for (int i = startPos + incr; incr * i <= endIdx; i += incr) { // increasing/decreasing functionality
-//            legal = false;
-//            Action temp_action = null;
-//
-//            try {
-//                temp_action = (x != 0) ? new Action(getBox(coord.getRow(), coord.getCol()), getBox(i, coord.getCol()), state.getTurn()) : new Action(getBox(coord.getRow(), coord.getCol()), getBox(coord.getRow(), i), state.getTurn());
-////				System.out.println("Checking Action " + temp_action.toString());
-//            } catch (IOException e1) {
-//                // TODO Auto-generated catch block
-//                e1.printStackTrace();
-//            }
-//
-//            // check the legality of the action according to the Ashton Tablut rules
-//            try {
-//                rules.checkMove(state.clone(), temp_action);
-//                legal = true;
-//            } catch (Exception e) {
-//
-//            }
-//            if(legal)
-//                legalMovesInDir.add(temp_action);
-//        }
-//
-//        return legalMovesInDir;
-//    }
 }

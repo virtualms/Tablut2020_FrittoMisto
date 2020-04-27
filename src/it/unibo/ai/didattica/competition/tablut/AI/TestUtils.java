@@ -24,9 +24,7 @@ public class TestUtils {
         List<Action> l = u.getSuccessors(state);
         end = System.currentTimeMillis();
 
-
         delay1 = end - start;
-        System.out.println("PIVOTING___Done in " + delay1 + ". Count " + l.size());
 
         //TODO BOIAAAAAAAAAAAAAA FUNZIONA
 
@@ -58,7 +56,7 @@ public class TestUtils {
 */
 
 
-
+    /*
         for(Action a: u.getSuccessors(state)){
             try {
                 game.checkMove(state.clone(), a);
@@ -72,7 +70,7 @@ public class TestUtils {
         delay2 = System.currentTimeMillis() - start;
         System.out.println("Delay " + delay2);
 
-
+    */
     }
 
 

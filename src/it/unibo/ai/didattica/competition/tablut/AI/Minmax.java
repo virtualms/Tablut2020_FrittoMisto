@@ -130,7 +130,7 @@ public final class Minmax implements Callable<Action> {
         //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
         for (Action action : u.getSuccessors(state)) {
 
-            value = Math.max(value, minValue(this.checkMove(currentState.clone(), action), alpha, beta, depth + 1));
+            value = Math.max(value, minValue(this.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value >= beta)
                 return value;
             alpha = Math.max(alpha, value);
@@ -143,10 +143,10 @@ public final class Minmax implements Callable<Action> {
             return Heuristic.eval(state, player);
 
         double value = Double.POSITIVE_INFINITY;
-        //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
+
         for (Action action : u.getSuccessors(state)) {
 
-            value = Math.min(value, maxValue(this.checkMove(currentState.clone(), action), alpha, beta, depth + 1));
+            value = Math.min(value, maxValue(this.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value <= alpha)
                 return value;
             beta = Math.min(beta, value);
