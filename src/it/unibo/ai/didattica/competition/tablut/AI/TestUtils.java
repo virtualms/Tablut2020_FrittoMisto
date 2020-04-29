@@ -25,6 +25,9 @@ public class TestUtils {
         end = System.currentTimeMillis();
 
         delay1 = end - start;
+        int n = state.getNumberOf(State.Pawn.WHITE);
+
+        System.out.println(n);
 
         //TODO BOIAAAAAAAAAAAAAA FUNZIONA
 

@@ -28,6 +28,26 @@ public class Coord {
         this.col = col;
     }
 
+    /**************utility*****************************/
+    public int distanceFrom(Coord other){
+        return Math.abs(this.getRow() - other.getRow()) + Math.abs(this.getCol() - other.getCol());
+    }
+
+    public boolean closeTo(Coord other){
+        if(other.getCol() < 0 || other.getRow() < 0)
+            return false;
+
+//        //same column
+//        if(this.getCol() == other.getCol() && (this.getRow() == other.getRow() + 1 || this.getRow() == other.getRow() - 1))
+//            return true;
+//
+//        //same row
+//        if(this.getRow() == other.getRow() && (this.getCol() == other.getCol() + 1 || this.getCol() == other.getCol() - 1))
+//            return true;
+
+        return Math.abs(this.getCol() - other.getCol() + this.getRow() - other.getRow()) == 1;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

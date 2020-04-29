@@ -29,6 +29,9 @@ public final class Minmax implements Callable<Action> {
     private Action result;
     private List<String> citadels;
 
+    //TODO AGGIUNTA
+    private Heuristic heuristic;
+
 
 //     Può essere inserito oppure no, vediamo come si comporta il timeout
     public Minmax(Game game, int currDepthLimit, State.Turn player, boolean iterative) {
@@ -37,6 +40,8 @@ public final class Minmax implements Callable<Action> {
         this.player = player;
         this.iterative = iterative;
         this.u = new Utils(true);
+        this.heuristic = new HeuristicFrittoMisto(player);
+
         this.citadels = new ArrayList<>();
 
         this.citadels.add("a4");
@@ -103,7 +108,6 @@ public final class Minmax implements Callable<Action> {
 
         //TODO: Collection più performante?
         List<Action> azioni = null;
-//      azioni = game.getAllLegalActions(currentState);
         azioni = u.getSuccessors(currentState);
 
         //TODO FACCIO SHUFFLE O LE PARTITE SONO TUTTE UGUALI (ANDREBBE FATTO IN UTILITY, DANDO PRIORITA' ALLE MOSSE DEL RE (?))
@@ -114,6 +118,7 @@ public final class Minmax implements Callable<Action> {
 
             double value = minValue(this.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
 
+            //TODO COSI' SALVIAMO SOLO UN RESULT, FORSE SERVE UNA LISTA CON TUTTE LE AZIONI A PARIMERITO DI VALUE
             if (value > resultValue) {
                 result = action;
                 resultValue = value;
@@ -124,7 +129,7 @@ public final class Minmax implements Callable<Action> {
 
     public double maxValue(State state, double alpha, double beta, int depth) throws Exception{
         if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
-            return Heuristic.eval(state, player);
+            return evaluate(state, player);
 
         double value = Double.NEGATIVE_INFINITY;
         //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
@@ -140,7 +145,7 @@ public final class Minmax implements Callable<Action> {
 
     public double minValue(State state, double alpha, double beta, int depth) throws Exception{
         if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
-            return Heuristic.eval(state, player);
+            return evaluate(state, player);
 
         double value = Double.POSITIVE_INFINITY;
 
@@ -156,6 +161,10 @@ public final class Minmax implements Callable<Action> {
 
 
 
+    private double evaluate(State state, State.Turn player){
+        return heuristic.eval(state);
+        //return HeuristicImpl.eval(state, player);
+    }
 
 
     /***********************++*************************++**********************************/
