@@ -25,12 +25,20 @@ public class HeuristicFrittoMisto implements Heuristic{
      * Distanza (in Coord) da punti di vittoria
      */
 
+    public static final int KING_MANHATTAN = 0;
+    public static final int KING_CAPTURED_SIDES = 1;
+    public static final int PAWS_DIFFERENCE = 2;
+    public static final int PAWS_WHITE = 3;
+    public static final int PAWS_BLACK = 6;
+    public static final int VICTORY = 5;
+    public static final int VICTORY_PATH = 4;
+
     private int initialBlack;
     private int initialWhite;
     private Coord castle;
     private List<Coord> citadels;
     private List<Coord> winPos;
-    private double weight[];
+    private static double weight[];
     private State.Turn playerColor; //il colore del client
 
     /****************const***********************/
@@ -57,15 +65,29 @@ public class HeuristicFrittoMisto implements Heuristic{
         initPos();
     }
 
+//    public HeuristicFrittoMisto(State.Turn playerColor, double[] weights){
+//        this.initialWhite = 9;
+
+    public static void setWeight(double[] weight) {
+        HeuristicFrittoMisto.weight = weight;
+    }
+
+//        this.initialBlack = 16;
+//        this.playerColor = playerColor;
+//
+//        this.weight = weights.clone();
+//        initPos();
+//    }
+
     private void initWeights(){
         this.weight = new double[7];
-        weight[0] = 50;  //manhattan
-        weight[1] = -100;  //king capture
-        weight[2] = 100;  //lost pawns
-        weight[3] = 100 * (16/9); //white pieces difference
-        weight[4] = 300;  //victory path
-        weight[5] = WIN;  //victory
-        weight[6] = -100; //black pieces
+        weight[KING_MANHATTAN] = 50;  //manhattan
+        weight[KING_CAPTURED_SIDES] = -100;  //king capture
+        weight[PAWS_DIFFERENCE] = 100;  //lost pawns
+        weight[PAWS_WHITE] = 100 * (16/9); //white pieces (difference ?)
+        weight[VICTORY_PATH] = 300;  //victory path
+        weight[VICTORY] = WIN;  //victory
+        weight[PAWS_BLACK] = -100; //black pieces
     }
 
     private void initPos(){
@@ -130,13 +152,13 @@ public class HeuristicFrittoMisto implements Heuristic{
         List<Coord> whitePieces = pieces.get(state.WHITE);
         Coord king = pieces.get(state.KING).get(0);
 
-        double V =  weight[0] * kingManhattan(king)                                    +
-                    weight[1] * kingCapture(king, blackPieces)                         +
-                    weight[2] * lostPaws(blackPieces, whitePieces, state.getTurn())    +
-                    weight[3] * whitePieces.size()                                     +
-                    weight[4] * victoryPaths(king, blackPieces, whitePieces)           +
-                    weight[5] * winCondition(state.getTurn())                          +
-                    weight[6] * blackPieces.size();
+        double V =  weight[KING_MANHATTAN] * kingManhattan(king)                                    +
+                    weight[KING_CAPTURED_SIDES] * kingCapture(king, blackPieces)                         +
+                    weight[PAWS_DIFFERENCE] * lostPaws(blackPieces, whitePieces, state.getTurn())    +
+                    weight[PAWS_WHITE] * whitePieces.size()                                     +
+                    weight[VICTORY_PATH] * victoryPaths(king, blackPieces, whitePieces)           +
+                    weight[VICTORY] * winCondition(state.getTurn())                          +
+                    weight[PAWS_BLACK] * blackPieces.size();
 
         return V * color;
     }
@@ -172,8 +194,9 @@ public class HeuristicFrittoMisto implements Heuristic{
     /**2**/
     //TODO DA RENDERE UNA SOMMA SENZA COEFF COME PER GLI ALTRI
     private double lostPaws(List<Coord> black, List<Coord> white, State.Turn turn){
-        double coeff = 16/9; //per equilibrare la situazione di pezzi
-        return - (coeff)*(initialWhite - white.size()) + (initialBlack - black.size());
+//        double coeff = 16/9; //per equilibrare la situazione di pezzi
+//        return - (coeff)*(initialWhite - white.size()) + (initialBlack - black.size());
+        return 0;
     }
 
 //    //3
