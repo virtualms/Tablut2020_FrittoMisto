@@ -29,7 +29,6 @@ public final class Minmax implements Callable<Action> {
     private Action result;
     private List<String> citadels;
 
-    //TODO AGGIUNTA
     private Heuristic heuristic;
 
 
@@ -65,7 +64,7 @@ public final class Minmax implements Callable<Action> {
     public Action makeDecision(int timeOut, State stato) throws IOException {
 
         //In questo modo per passare i parametri a call()
-        currentState = stato;
+        currentState = stato.clone();
 
         //metto in esecuzione il task (viene chiamata "call()")
         Future<Action> risultato = executorService.submit(this);
@@ -107,8 +106,7 @@ public final class Minmax implements Callable<Action> {
         double resultValue = Double.NEGATIVE_INFINITY;
 
         //TODO: Collection più performante?
-        List<Action> azioni = null;
-        azioni = u.getSuccessors(currentState);
+        List<Action> azioni = u.getSuccessors(currentState);
 
         //TODO FACCIO SHUFFLE O LE PARTITE SONO TUTTE UGUALI (ANDREBBE FATTO IN UTILITY, DANDO PRIORITA' ALLE MOSSE DEL RE (?))
         Collections.shuffle(azioni);

@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 
 /**
  * 
- * @author A. Piretti, Andrea Galassi
+ * @author
  *
  */
 public class TablutFrittoMistoClient extends TablutClient {

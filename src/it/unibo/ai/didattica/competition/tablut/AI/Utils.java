@@ -9,15 +9,10 @@ import java.util.List;
 
 public class Utils {
 
-
-    //TODO Miglioramenti: tutti array di boolean o byte se java puro.
-
     private boolean suppressPrint;
-    private Coord kingCord;
 
     public Utils(boolean suppressPrint){
         this.suppressPrint = suppressPrint;
-        this.kingCord = new Coord(4, 4);
     }
 
     /*****get-set****/
@@ -27,14 +22,6 @@ public class Utils {
 
     public void setSuppressPrint(boolean suppressPrint) {
         this.suppressPrint = suppressPrint;
-    }
-
-    public Coord getKingCord() {
-        return kingCord;
-    }
-
-    public void setKingCord(Coord kingCord) {
-        this.kingCord = kingCord;
     }
 
 
@@ -76,63 +63,10 @@ public class Utils {
 
                 else {
                     bytes[r][c] = 1;
-                    //AGGIUNTA COORDINATA DEL RE
-                    if(board[r][c].equals(State.Pawn.KING)) {
-                        kingCord.setRow(r);
-                        kingCord.setCol(c);
-                    }
 
                     //mentre ciclo salvo le coordinate (utile classe ausiliaria coord) di tutti i pezzi del mio colore che incontro
                     if (board[r][c].equals(State.Pawn.WHITE) || board[r][c].equals(State.Pawn.KING))
                         whitePieces.add(new Coord(r, c));
-                }
-            }
-        }
-
-        return bytes;
-    }
-
-    public byte[][] b_map2_camp(State state, List<Coord> blackPieces) {
-        //BLACK: b-map1 -->ciclo sullo stato, se incontro un pedone o castello T metto un 1 altrimenti uno 0
-        State.Pawn[][] board = state.getBoard();
-        byte[][] bytes = new byte[9][9];
-
-        int r, c;
-        for (r = 0; r < 9; r++) {
-            for (c = 0; c < 9; c++) {
-                if (board[r][c].equals(State.Pawn.EMPTY) && !isCastle(r, c))
-                    //TODO NON E' VERO, POSSO MUOVERMI SOLO NEL MIO CAMPO!!! Posso aggiungere un controllo che la distanza da from to < 8
-                    //impossibile per qualsiasi mossa, anche per le pedine centrali
-                    bytes[r][c] = 0;
-                else {
-                    bytes[r][c] = 1;
-
-                    if (/*state.getTurn().equals(State.Turn.WHITE) &&*/ board[r][c].equals(State.Pawn.BLACK))
-                        blackPieces.add(new Coord(r, c));
-                }
-            }
-        }
-
-        return bytes;
-    }
-
-    //idem w_map1
-    public byte[][] b_map1(State state, List<Coord> blackPieces) {
-        //ciclo sullo stato, se incontro un pedone o campo/castello metto un 1 altrimenti uno 0
-        State.Pawn[][] board = state.getBoard();
-        byte[][] bytes = new byte[9][9];
-
-        int r, c;
-        for (r = 0; r < 9; r++) {
-            for (c = 0; c < 9; c++) {
-                if (board[r][c].equals(State.Pawn.EMPTY) && !isCamp(r, c) && !isCastle(r, c))
-                    bytes[r][c] = 0;
-                else {
-                    bytes[r][c] = 1;
-
-                    //già fatto
-                    //if(/*state.getTurn().equals(State.Turn.WHITE) &&*/ board[r][c].equals("B"))
-                    //    blackPieces.add(new Coord(r,c));
                 }
             }
         }
@@ -159,11 +93,6 @@ public class Utils {
                     bytes[1][r][c] = 1;
                     bytes[0][r][c] = 1;
 
-                    //where is King?
-                    if(board[r][c].equals(State.Pawn.KING)) {
-                        kingCord.setRow(r);
-                        kingCord.setCol(c);
-                    }
 
                     if(board[r][c].equals(State.Pawn.BLACK))
                         blackPieces.add(new Coord(r, c));
@@ -297,7 +226,7 @@ public class Utils {
 
         //scorro la colonna verso su, mi muovo su una colonna cambiando righe
         for(int i=pivot+1; i<9; i++){
-            if(/*!array.get(i)*/ table[i][c.getCol()] == 0) { //table[i][c.getCol()] == 0
+            if(/*!array.get(i)*/ table[i][c.getCol()] == 0) {
                 if(i - pivot == 8 && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(i);
                 String to = getBox(i, c.getCol());
@@ -308,7 +237,7 @@ public class Utils {
 
         //vado verso giù, mi muovo su una colonna cambiando righe
         for(int k=pivot-1; k>=0; k--){
-            if(/*!array.get(k)*/table[k][c.getCol()] == 0) { //table[k][c.getCol()] == 0
+            if(/*!array.get(k)*/table[k][c.getCol()] == 0) {
                 if(pivot - k == 8 && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(k);
                 String to = getBox(k, c.getCol());
@@ -331,7 +260,7 @@ public class Utils {
 
         //vado verso destra sulla riga, mi muovo su una riga cambiando righe
         for(int i=pivot+1; i<9; i++){
-            if(/*!array.get(i)*/table[c.getRow()][i] == 0) { //table[c.getRow()][i] == 0
+            if(/*!array.get(i)*/table[c.getRow()][i] == 0) {
                 if(i - pivot == 8 && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(i);
                 String to = getBox(c.getRow(), i);
@@ -342,7 +271,7 @@ public class Utils {
 
         //vado verso sinistra
         for(int k=pivot-1; k>=0; k--){
-            if(/*!array.get(k)*/table[c.getRow()][k] == 0) { //table[c.getRow()][k] == 0
+            if(/*!array.get(k)*/table[c.getRow()][k] == 0) {
                 if((pivot - k == 8) && !place_8_steps(c)) continue; //si potrebbe mettere break
                 vec.set(k);
                 String to = getBox(c.getRow(), k);

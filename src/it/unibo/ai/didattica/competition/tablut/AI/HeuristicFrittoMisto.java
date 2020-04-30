@@ -63,7 +63,7 @@ public class HeuristicFrittoMisto implements Heuristic{
         weight[1] = -100;  //king capture
         weight[2] = 100;  //lost pawns
         weight[3] = 100 * (16/9); //white pieces difference
-        weight[4] = 500;  //victory path
+        weight[4] = 300;  //victory path
         weight[5] = WIN;  //victory
         weight[6] = -100; //black pieces
     }
@@ -143,8 +143,10 @@ public class HeuristicFrittoMisto implements Heuristic{
 
     /******************************************************/
 
+
+
     /***********************FUNC*************************/
-    //0
+    /**0**/
     private double kingManhattan(Coord king){
         //6 massima distanza da win position
         return 6 - winPos.stream().
@@ -153,7 +155,8 @@ public class HeuristicFrittoMisto implements Heuristic{
                 getAsDouble();
     }
 
-    //1
+    /**1**/
+    //Lati accerchiati del re
     private double kingCapture(Coord king, List<Coord> blackPieces){
         double count=0;
 
@@ -166,7 +169,7 @@ public class HeuristicFrittoMisto implements Heuristic{
         return count;
     }
 
-    //2
+    /**2**/
     //TODO DA RENDERE UNA SOMMA SENZA COEFF COME PER GLI ALTRI
     private double lostPaws(List<Coord> black, List<Coord> white, State.Turn turn){
         double coeff = 16/9; //per equilibrare la situazione di pezzi
@@ -179,15 +182,16 @@ public class HeuristicFrittoMisto implements Heuristic{
 //        return whitePieces * coeff - blackPieces;
 //    }
 
-    //4
+    /**4**/
+    //strade aperte di vittoria per il re
     private double victoryPaths(Coord king, List<Coord> blackPieces, List<Coord> whitePieces) {
 
-        List<Coord> victoryPos = isVictoryRoad(king);
+        List<Coord> victoryPos = victoryRoads(king);
 
         if(victoryPos.isEmpty()) return 0;
 
         double paths=0;
-        Stream<Coord> s = Stream.concat(blackPieces.stream(), whitePieces.stream());
+        Stream<Coord> s;
         Optional<Coord> o;
         for(Coord victory : victoryPos){
             s = Stream.concat(blackPieces.stream(), whitePieces.stream());
@@ -218,7 +222,7 @@ public class HeuristicFrittoMisto implements Heuristic{
         return false;
     }
 
-    private List<Coord> isVictoryRoad(Coord king){
+    private List<Coord> victoryRoads(Coord king){
         List<Coord> posSelected = winPos.stream().
                 filter(w -> king.getRow() == w.getRow() || king.getCol() == w.getCol()).
                 collect(Collectors.toList());
@@ -226,7 +230,8 @@ public class HeuristicFrittoMisto implements Heuristic{
         return posSelected;
     }
 
-    //5
+    /***5***/
+    //vittoria o sconfitta
     private double winCondition(State.Turn turn){
         if(turn == State.Turn.WHITEWIN)
             return 1;
