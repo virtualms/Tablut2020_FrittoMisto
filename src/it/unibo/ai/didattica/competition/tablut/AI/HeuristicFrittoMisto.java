@@ -204,7 +204,6 @@ public class HeuristicFrittoMisto implements Heuristic{
         //servono a riutilizzare uno stream
         Supplier<Stream<Coord>> sup1, sup2;
 
-
         sup1 = () -> Stream.concat(blackPieces.stream(), whitePieces.stream());
         sup2 = () -> Stream.concat(sup1.get(), citadels.stream());
 
@@ -217,31 +216,31 @@ public class HeuristicFrittoMisto implements Heuristic{
         return paths;
     }
 
-    private boolean isBetween(Coord piece, Coord victory, Coord king){
+    private boolean isBetween(Coord p, Coord piece_a, Coord piece_b){
         double max, min;
 
-        if(piece.equals((Coord)king)) return false;
+        if(p.equals((Coord)piece_b)) return false;
 
         //controllo le colonne
-        if(victory.getCol() == king.getCol()){
+        if(piece_a.getCol() == piece_b.getCol()){
 
-            if(piece.getCol() != king.getCol()) return false;
+            if(p.getCol() != piece_b.getCol()) return false;
 
-            max = (victory.getRow() >= king.getRow() ? victory.getRow() : king.getRow());
-            min = (victory.getRow() < king.getRow() ? victory.getRow() : king.getRow());
+            max = (piece_a.getRow() >= piece_b.getRow() ? piece_a.getRow() : piece_b.getRow());
+            min = (piece_a.getRow() < piece_b.getRow() ? piece_a.getRow() : piece_b.getRow());
 
-            return piece.getRow() >= min && piece.getRow() <= max;
+            return p.getRow() >= min && p.getRow() <= max;
         }
 
         //controllo le righe
-        else if(victory.getRow() == king.getRow()){
+        else if(piece_a.getRow() == piece_b.getRow()){
 
-            if(piece.getRow() != king.getRow()) return false;
+            if(p.getRow() != piece_b.getRow()) return false;
 
-            max = (victory.getCol() >= king.getCol() ? victory.getCol() : king.getCol());
-            min = (victory.getCol() < king.getCol() ? victory.getCol() : king.getCol());
+            max = (piece_a.getCol() >= piece_b.getCol() ? piece_a.getCol() : piece_b.getCol());
+            min = (piece_a.getCol() < piece_b.getCol() ? piece_a.getCol() : piece_b.getCol());
 
-            return piece.getCol() >= min && piece.getCol() <= max;
+            return p.getCol() >= min && p.getCol() <= max;
         }
 
         return false;
