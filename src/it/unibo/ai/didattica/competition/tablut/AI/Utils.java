@@ -215,13 +215,13 @@ public class Utils {
         List<Action> res = new LinkedList<>();
         //BitSet array = null; //vettore originale
         BitSet vec = new BitSet(9); //vettore posizioni ammissibili, usato per debug
-        int pivot = -1;
+
 
         /*****column*****/
         //array = getColumn(table, c.getCol()); --> table[i][c.getCol()]
         String from = getBox(c.getRow(), c.getCol());
 
-        pivot = c.getRow(); //pezzo da muovere
+        int pivot = c.getRow(); //pezzo da muovere
         //vec.set(pivot); //posizione pezzo
 
         //scorro la colonna verso su, mi muovo su una colonna cambiando righe

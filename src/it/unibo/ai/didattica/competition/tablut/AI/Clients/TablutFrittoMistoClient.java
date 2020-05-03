@@ -86,7 +86,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 
 						/*****AGGIUNTE*****/
 						action = minmax.makeDecision(timeOut, getCurrentState());
-
+						System.out.println("From: "+ action.getFrom() + ", to=" + action.getTo());
 
 						this.write(action);
 					} else if (this.getCurrentState().getTurn().equals(Turn.BLACK)) {
@@ -118,6 +118,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 
 
 						action = minmax.makeDecision(timeOut, getCurrentState());
+						System.out.println("From: "+ action.getFrom() + ", to=" + action.getTo());
 
 
 						this.write(action);

@@ -5,6 +5,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.State;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,12 +40,10 @@ public class HeuristicFrittoMisto implements Heuristic{
     private List<Coord> citadels;
     private List<Coord> winPos;
     private static double weight[];
-    private State.Turn playerColor; //il colore del client
+    private final State.Turn playerColor; //il colore del client
 
     /****************const***********************/
-    private final double CAPTURE = 1;
     private final double WIN = 5000;
-    private final double LOSS = -5000;
 
 
     public HeuristicFrittoMisto(int initialBlack, int initialWhite, State.Turn playerColor) {
@@ -65,26 +64,16 @@ public class HeuristicFrittoMisto implements Heuristic{
         initPos();
     }
 
-//    public HeuristicFrittoMisto(State.Turn playerColor, double[] weights){
-//        this.initialWhite = 9;
-
     public static void setWeight(double[] weight) {
         HeuristicFrittoMisto.weight = weight;
     }
-
-//        this.initialBlack = 16;
-//        this.playerColor = playerColor;
-//
-//        this.weight = weights.clone();
-//        initPos();
-//    }
 
     private void initWeights(){
         this.weight = new double[7];
         weight[KING_MANHATTAN] = 50;  //manhattan
         weight[KING_CAPTURED_SIDES] = -100;  //king capture
         weight[PAWS_DIFFERENCE] = 100;  //lost pawns
-        weight[PAWS_WHITE] = 100 * (16/9); //white pieces (difference ?)
+        weight[PAWS_WHITE] = 100 * (16.0/9); //white pieces (difference ?)
         weight[VICTORY_PATH] = 300;  //victory path
         weight[VICTORY] = WIN;  //victory
         weight[PAWS_BLACK] = -100; //black pieces
@@ -152,13 +141,13 @@ public class HeuristicFrittoMisto implements Heuristic{
         List<Coord> whitePieces = pieces.get(state.WHITE);
         Coord king = pieces.get(state.KING).get(0);
 
-        double V =  weight[KING_MANHATTAN] * kingManhattan(king)                                    +
-                    weight[KING_CAPTURED_SIDES] * kingCapture(king, blackPieces)                         +
-                    weight[PAWS_DIFFERENCE] * lostPaws(blackPieces, whitePieces, state.getTurn())    +
-                    weight[PAWS_WHITE] * whitePieces.size()                                     +
-                    weight[VICTORY_PATH] * victoryPaths(king, blackPieces, whitePieces)           +
-                    weight[VICTORY] * winCondition(state.getTurn())                          +
-                    weight[PAWS_BLACK] * blackPieces.size();
+        double V =  weight[KING_MANHATTAN]      * kingManhattan(king)                                   +
+                    weight[KING_CAPTURED_SIDES] * kingCapture(king, blackPieces)                        +
+                    weight[PAWS_DIFFERENCE]     * lostPaws(blackPieces, whitePieces, state.getTurn())   +
+                    weight[PAWS_WHITE]          * whitePieces.size()                                    +
+                    weight[VICTORY_PATH]        * victoryPaths(king, blackPieces, whitePieces)          +
+                    weight[VICTORY]             * winCondition(state.getTurn())                         +
+                    weight[PAWS_BLACK]          * blackPieces.size();
 
         return V * color;
     }
@@ -182,9 +171,9 @@ public class HeuristicFrittoMisto implements Heuristic{
     private double kingCapture(Coord king, List<Coord> blackPieces){
         double count=0;
 
-        count = blackPieces.stream().filter(b -> king.closeTo(b)).count();
+        Stream<Coord> s = Stream.concat(blackPieces.stream(), citadels.stream());
 
-        count = count + citadels.stream().filter(c -> king.closeTo(c)).count();
+        count = s.filter(king::closeTo).count();
 
         if(king.closeTo(castle)) count++;
 
@@ -199,26 +188,29 @@ public class HeuristicFrittoMisto implements Heuristic{
         return 0;
     }
 
-//    //3
-//    private double pawsDifference(int blackPieces, int whitePieces){
-//        double coeff = 16/9; //per equilibrare la situazione di pezzi
-//        return whitePieces * coeff - blackPieces;
-//    }
+    /**3**/
+    //pezzi bianchi
 
     /**4**/
     //strade aperte di vittoria per il re
-    private double victoryPaths(Coord king, List<Coord> blackPieces, List<Coord> whitePieces) {
+    public double victoryPaths(Coord king, List<Coord> blackPieces, List<Coord> whitePieces) {
 
         List<Coord> victoryPos = victoryRoads(king);
 
         if(victoryPos.isEmpty()) return 0;
 
         double paths=0;
-        Stream<Coord> s;
         Optional<Coord> o;
+        //servono a riutilizzare uno stream
+        Supplier<Stream<Coord>> sup1, sup2;
+
+
+        sup1 = () -> Stream.concat(blackPieces.stream(), whitePieces.stream());
+        sup2 = () -> Stream.concat(sup1.get(), citadels.stream());
+
+        //controllo che non ci siano pezzi/cittadelle fra il re e le victorypos
         for(Coord victory : victoryPos){
-            s = Stream.concat(blackPieces.stream(), whitePieces.stream());
-            o = s.filter(p -> isBetween(p, victory, king)).findAny();
+            o = sup2.get().filter(p -> isBetween(p, victory, king)).findAny();
 
             if(!o.isPresent()) paths++;
         }
@@ -228,14 +220,24 @@ public class HeuristicFrittoMisto implements Heuristic{
     private boolean isBetween(Coord piece, Coord victory, Coord king){
         double max, min;
 
+        if(piece.equals((Coord)king)) return false;
+
+        //controllo le colonne
         if(victory.getCol() == king.getCol()){
+
+            if(piece.getCol() != king.getCol()) return false;
+
             max = (victory.getRow() >= king.getRow() ? victory.getRow() : king.getRow());
             min = (victory.getRow() < king.getRow() ? victory.getRow() : king.getRow());
 
             return piece.getRow() >= min && piece.getRow() <= max;
         }
 
+        //controllo le righe
         else if(victory.getRow() == king.getRow()){
+
+            if(piece.getRow() != king.getRow()) return false;
+
             max = (victory.getCol() >= king.getCol() ? victory.getCol() : king.getCol());
             min = (victory.getCol() < king.getCol() ? victory.getCol() : king.getCol());
 
@@ -246,11 +248,12 @@ public class HeuristicFrittoMisto implements Heuristic{
     }
 
     private List<Coord> victoryRoads(Coord king){
-        List<Coord> posSelected = winPos.stream().
-                filter(w -> king.getRow() == w.getRow() || king.getCol() == w.getCol()).
-                collect(Collectors.toList());
 
-        return posSelected;
+        //tutte le victory pos accessibili dal re
+
+        return winPos.stream().
+                filter(w -> (king.getRow() == w.getRow() || king.getCol() == w.getCol())).
+                collect(Collectors.toList());
     }
 
     /***5***/
@@ -263,6 +266,10 @@ public class HeuristicFrittoMisto implements Heuristic{
 
         return 0;
     }
+
+    /**6**/
+    //pezzi neri
+
 
     /******************************************************************/
 }

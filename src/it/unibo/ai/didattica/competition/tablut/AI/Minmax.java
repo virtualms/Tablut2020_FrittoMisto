@@ -19,7 +19,7 @@ public final class Minmax implements Callable<Action> {
     public static Game game;
     protected int currDepthLimit;
     private State.Turn player;
-    private Utils u = null;
+    private Utils u;
 
     //TODO: è per limitare, eventualmente, la ricerca soltanto al primo livello
     private boolean iterative;
