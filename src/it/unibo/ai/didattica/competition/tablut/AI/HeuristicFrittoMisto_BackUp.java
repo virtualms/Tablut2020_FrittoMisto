@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class HeuristicFrittoMisto implements Heuristic{
+public class HeuristicFrittoMisto_BackUp implements Heuristic{
 
     /* FUNZIONE DI VALUTAZIONE V.
      * Funzione di valutazione a somma zero( F_bianco + F_nero deve risultare uguale a 0 o si rischiano squilibri ).
@@ -48,7 +48,7 @@ public class HeuristicFrittoMisto implements Heuristic{
     private final double LOSS = -5000;
 
 
-    public HeuristicFrittoMisto(int initialBlack, int initialWhite, State.Turn playerColor) {
+    public HeuristicFrittoMisto_BackUp(int initialBlack, int initialWhite, State.Turn playerColor) {
         this.initialBlack = initialBlack;
         this.initialBlack = initialWhite;
         this.playerColor = playerColor;
@@ -57,7 +57,7 @@ public class HeuristicFrittoMisto implements Heuristic{
         initPos();
     }
 
-    public HeuristicFrittoMisto(State.Turn playerColor){
+    public HeuristicFrittoMisto_BackUp(State.Turn playerColor){
         this.initialWhite = 9;
         this.initialBlack = 16;
         this.playerColor = playerColor;
@@ -70,7 +70,7 @@ public class HeuristicFrittoMisto implements Heuristic{
 //        this.initialWhite = 9;
 
     public static void setWeight(double[] weight) {
-        HeuristicFrittoMisto.weight = weight;
+        HeuristicFrittoMisto_BackUp.weight = weight;
     }
 
 //        this.initialBlack = 16;

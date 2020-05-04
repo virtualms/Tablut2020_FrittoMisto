@@ -63,6 +63,10 @@ public class Utils {
 
                 else {
                     bytes[r][c] = 1;
+                    //mentre ciclo salvo le coordinate (utile classe ausiliaria coord) di tutti i pezzi del mio colore che incontro
+                    if (board[r][c].equals(State.Pawn.WHITE))
+                        whitePieces.add(new Coord(r, c));
+//salvo il re
 
                     //mentre ciclo salvo le coordinate (utile classe ausiliaria coord) di tutti i pezzi del mio colore che incontro
                     if (board[r][c].equals(State.Pawn.WHITE) || board[r][c].equals(State.Pawn.KING))
@@ -92,8 +96,6 @@ public class Utils {
                 else {
                     bytes[1][r][c] = 1;
                     bytes[0][r][c] = 1;
-
-
                     if(board[r][c].equals(State.Pawn.BLACK))
                         blackPieces.add(new Coord(r, c));
                 }//else
@@ -116,7 +118,7 @@ public class Utils {
     public List<Action> getSuccessors(State state) {
 
         //Coordinate dei pezzi
-        List<Coord> whitePieces = new ArrayList<>();
+        List<Coord> whitePieces = new LinkedList<>();
         List<Coord> blackPieces = new ArrayList<>();
         //risultato
         List<Action> possibleActions = new LinkedList<>();
@@ -132,13 +134,11 @@ public class Utils {
 
             for(Coord c : whitePieces){
                 try {
-
                     //TODO ESPLORO PRIMA LE MOSSE DEL RE, HA SENSO?
-//                    if(kingCord.equals(c))
-//                        possibleActions.addAll(0, pivoting(c, table, state.getTurn()));
-//                    else
+                    if(whitePieces.get(0).equals(c))
+                        possibleActions.addAll(0, pivoting(c, table, state.getTurn()));
+                    else
                         possibleActions.addAll(pivoting(c, table, state.getTurn()));
-
                 }
                 catch (Exception e){
                     System.out.println(e.getStackTrace());

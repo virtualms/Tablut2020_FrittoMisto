@@ -244,6 +244,7 @@ public abstract class State {
 
 
 	/**********************TODO aggiunte********************/
+	//todo non sono sicuro che sia buono aggiungere roba qui. forse conviene creare una classe nostra che estende qiesta
 
 	public final int KING = 2;
 	public final int WHITE = 1;

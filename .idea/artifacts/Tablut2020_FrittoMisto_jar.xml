@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Tablut2020_FrittoMisto:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Tablut2020_FrittoMisto_jar</output-path>
+    <root id="archive" name="Tablut2020_FrittoMisto.jar">
+      <element id="module-output" name="Tablut2020_FrittoMisto" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gson-2.2.2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

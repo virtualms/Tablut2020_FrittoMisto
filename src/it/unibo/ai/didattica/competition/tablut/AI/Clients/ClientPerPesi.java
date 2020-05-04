@@ -1,16 +1,23 @@
 package it.unibo.ai.didattica.competition.tablut.AI.Clients;
 
+import it.unibo.ai.didattica.competition.tablut.AI.Clients.Utils.MetricsPartita_Genetic;
 import it.unibo.ai.didattica.competition.tablut.AI.HeuristicFrittoMisto;
 
 import java.io.IOException;
 
 public class ClientPerPesi {
 
-//  non dovrebbe servire
-//    public static void main(String[] args) throws ClassNotFoundException, IOException {
-//
-//
-//    }
+    private String player;
+
+    public MetricsPartita_Genetic getMetrics() throws IOException, ClassNotFoundException {
+
+        String[] array = new String[]{player};
+//        String[] array = new String[]{"BLACK"};
+
+        return TablutFrittoMistoClient.main(array);
+    }
+
+
 
     public ClientPerPesi(String player, // "BLACK" or "WHITE"
                          double manhattanKing,
@@ -33,13 +40,7 @@ public class ClientPerPesi {
         weights[HeuristicFrittoMisto.PAWS_BLACK] = blackPaws;
         HeuristicFrittoMisto.setWeight(weights);
 
-//        String[] array = new String[]{player};
-
-        String[] array = new String[]{"BLACK"};
-
-
-        TablutFrittoMistoClient.main(array);
-
+        this.player = player;
     }
 
 }
