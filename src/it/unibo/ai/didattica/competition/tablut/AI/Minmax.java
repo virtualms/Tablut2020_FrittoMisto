@@ -107,8 +107,6 @@ public final class Minmax implements Callable<Action> {
 
         //TODO: Collection più performante?
         List<Action> azioni = u.getSuccessors(currentState);
-
-        //TODO FACCIO SHUFFLE O LE PARTITE SONO TUTTE UGUALI (ANDREBBE FATTO IN UTILITY, DANDO PRIORITA' ALLE MOSSE DEL RE (?))
         Collections.shuffle(azioni);
         result = azioni.get(0); //INIZIALIZZO RESULT CON UNA MOSSA A CASO
 

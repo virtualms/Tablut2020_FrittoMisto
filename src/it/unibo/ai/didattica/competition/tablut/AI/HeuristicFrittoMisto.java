@@ -73,7 +73,7 @@ public class HeuristicFrittoMisto implements Heuristic{
         weight[KING_MANHATTAN] = 50;  //manhattan
         weight[KING_CAPTURED_SIDES] = -100;  //king capture
         weight[PAWS_DIFFERENCE] = 100;  //lost pawns
-        weight[PAWS_WHITE] = 100 * (16.0/9); //white pieces (difference ?)
+        weight[PAWS_WHITE] = 100 * (16.0/9.0); //white pieces (difference ?)
         weight[VICTORY_PATH] = 300;  //victory path
         weight[VICTORY] = WIN;  //victory
         weight[PAWS_BLACK] = -100; //black pieces
@@ -216,31 +216,33 @@ public class HeuristicFrittoMisto implements Heuristic{
         return paths;
     }
 
-    private boolean isBetween(Coord p, Coord piece_a, Coord piece_b){
+    //piece - victory - king
+    private boolean isBetween(Coord p, Coord victory, Coord king){
         double max, min;
 
-        if(p.equals((Coord)piece_b)) return false;
+        if(p.equals((Coord)king)) return false;
+        if(p.equals((Coord)victory)) return true;
 
         //controllo le colonne
-        if(piece_a.getCol() == piece_b.getCol()){
+        if(victory.getCol() == king.getCol()){
 
-            if(p.getCol() != piece_b.getCol()) return false;
+            if(p.getCol() != king.getCol()) return false;
 
-            max = (piece_a.getRow() >= piece_b.getRow() ? piece_a.getRow() : piece_b.getRow());
-            min = (piece_a.getRow() < piece_b.getRow() ? piece_a.getRow() : piece_b.getRow());
+            max = (victory.getRow() >= king.getRow() ? victory.getRow() : king.getRow());
+            min = (victory.getRow() < king.getRow() ? victory.getRow() : king.getRow());
 
-            return p.getRow() >= min && p.getRow() <= max;
+            return p.getRow() > min && p.getRow() < max;
         }
 
         //controllo le righe
-        else if(piece_a.getRow() == piece_b.getRow()){
+        else if(victory.getRow() == king.getRow()){
 
-            if(p.getRow() != piece_b.getRow()) return false;
+            if(p.getRow() != king.getRow()) return false;
 
-            max = (piece_a.getCol() >= piece_b.getCol() ? piece_a.getCol() : piece_b.getCol());
-            min = (piece_a.getCol() < piece_b.getCol() ? piece_a.getCol() : piece_b.getCol());
+            max = (victory.getCol() >= king.getCol() ? victory.getCol() : king.getCol());
+            min = (victory.getCol() < king.getCol() ? victory.getCol() : king.getCol());
 
-            return p.getCol() >= min && p.getCol() <= max;
+            return p.getCol() > min && p.getCol() < max;
         }
 
         return false;

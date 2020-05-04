@@ -13,10 +13,11 @@ public class TestUtils {
         System.out.println("Testing...");
         Utils u = new Utils(true);
         State state = new StateTablut();
-
-        state.removePawn(4, 3);
-        state.removePawn(4, 2);
         state.removePawn(0, 3);
+        state.removePawn(4, 4);
+        state.getBoard()[0][2] = State.Pawn.BLACK;
+        state.getBoard()[1][0] = State.Pawn.BLACK;
+        state.getBoard()[1][2] = State.Pawn.KING;
 
         long start, end, delay1, delay2;
 
@@ -31,9 +32,12 @@ public class TestUtils {
 
         HeuristicFrittoMisto e = new HeuristicFrittoMisto(State.Turn.BLACK);
         start = System.currentTimeMillis();
+        double val = e.victoryPaths(new Coord(1, 2), state.getPieces().get(0), state.getPieces().get(1));
         end = System.currentTimeMillis();
 
         delay1 = end - start;
+
+        System.out.println(val);
 
 
     }

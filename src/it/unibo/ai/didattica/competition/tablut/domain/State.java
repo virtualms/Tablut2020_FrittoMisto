@@ -243,7 +243,7 @@ public abstract class State {
 
 
 
-	/**********************TODO aggiunte********************/
+	/**********************aggiunte********************/
 
 	public final int KING = 2;
 	public final int WHITE = 1;
