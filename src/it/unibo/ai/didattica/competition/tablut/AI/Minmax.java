@@ -26,9 +26,11 @@ public final class Minmax implements Callable<Action> {
 
 //  Come parametri per la call
     private State currentState;
-    private Action result;
-    private List<String> citadels;
 
+    //ZIO BOYS DEVE ESSERE STATIC STA ROBA. ALTRIMENTI NON è CONDIVISA TRA LE ISTANZE DI STA CLASSE
+    private static Action result;
+
+    private List<String> citadels;
     private Heuristic heuristic;
 
 
@@ -64,9 +66,10 @@ public final class Minmax implements Callable<Action> {
     public Action makeDecision(int timeOut, State stato) throws IOException {
 
         //In questo modo per passare i parametri a call()
-        currentState = stato.clone();
+        currentState = stato;
 
         //metto in esecuzione il task (viene chiamata "call()")
+//        Future<Action> risultato = executorService.submit(this);
         Future<Action> risultato = executorService.submit(this);
 
         //TODO: Come inizializzare una azione coerente qui? Per non metterla a null
@@ -81,7 +84,11 @@ public final class Minmax implements Callable<Action> {
 
             //importante altrimenti il thread che si occupa della call() continua ad eseguire
             //TODO ATTENZIONEEEEEE! NON SI TORNA UN RISOLTATO A VOLTE SE TIMEOUT TROPPO BASSO, BISOGNA TARARE BENE DEPTH O CAMBIARE
-            risultato.cancel(true);
+            boolean cancellato = risultato.cancel(true);
+
+
+            //TODO TOGLIERE STA STAMPA QUANDO SI VA IN PRODUZI0NE
+            System.out.println("-----------------------Esito cancellazione: " + cancellato);
 
             //Questo è il metodo che fa terminare il thread che lavora sui callable.
             //Decommentato altrimenti non potrebbero esserci chiamate successive di questo metodo.
@@ -112,13 +119,44 @@ public final class Minmax implements Callable<Action> {
 
         for (Action action : azioni) {
 
+            //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
             double value = minValue(this.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
+
+            //TODO: POTREBBE BASTARE SOLO NEL CICLO DELLA FUNZIONE call();
+            if(Thread.interrupted()){
+                System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi");
+                return result;
+            }
 
             //TODO COSI' SALVIAMO SOLO UN RESULT, FORSE SERVE UNA LISTA CON TUTTE LE AZIONI A PARIMERITO DI VALUE
             if (value > resultValue) {
                 result = action;
                 resultValue = value;
             }
+
+
+            //Questo è il codice che esegue la .cancel() (in FutureTask.java)
+
+//            public boolean cancel(boolean mayInterruptIfRunning) {
+//                if (!(state == NEW &&
+//                        UNSAFE.compareAndSwapInt(this, stateOffset, NEW,
+//                                mayInterruptIfRunning ? INTERRUPTING : CANCELLED)))
+//                    return false;
+//                try {    // in case call to interrupt throws exception
+//                    if (mayInterruptIfRunning) {
+//                        try {
+//                            Thread t = runner;
+//                            if (t != null)
+//                                t.interrupt();
+//                        } finally { // final state
+//                            UNSAFE.putOrderedInt(this, stateOffset, INTERRUPTED);
+//                        }
+//                    }
+//                } finally {
+//                    finishCompletion();
+//                }
+//                return true;
+//            }
         }
         return result;
     }
@@ -131,6 +169,7 @@ public final class Minmax implements Callable<Action> {
         //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
         for (Action action : u.getSuccessors(state)) {
 
+            //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
             value = Math.max(value, minValue(this.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value >= beta)
                 return value;
@@ -147,6 +186,7 @@ public final class Minmax implements Callable<Action> {
 
         for (Action action : u.getSuccessors(state)) {
 
+            //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
             value = Math.min(value, maxValue(this.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value <= alpha)
                 return value;

@@ -5,6 +5,7 @@ import it.unibo.ai.didattica.competition.tablut.client.TablutClient;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
 import java.io.BufferedReader;
@@ -20,7 +21,9 @@ import java.net.UnknownHostException;
 public class TablutFrittoMistoClient extends TablutClient {
 
 	private final int timeOut = 58;
-	private final int currDepthLimit = 3;
+//	private final int timeOut = 30;
+//	private final int currDepthLimit = 3;
+	private final int currDepthLimit = 4;
 	private Game game;
 	private static final String NAME = "FrittoMisto";
 
@@ -75,69 +78,54 @@ public class TablutFrittoMistoClient extends TablutClient {
 		}
 
 		if (this.getPlayer() == Turn.WHITE) {
-			System.out.println("You are player " + this.getPlayer().toString() + "!");
-			while (true) {
-				try {
-					this.read();
-
-					System.out.println("Current state:");
-					System.out.println(this.getCurrentState().toString());
-					if (this.getCurrentState().getTurn().equals(Turn.WHITE)) {
-
-						/*****AGGIUNTE*****/
-						action = minmax.makeDecision(timeOut, getCurrentState());
-						System.out.println("From: "+ action.getFrom() + ", to=" + action.getTo());
-
-						this.write(action);
-					} else if (this.getCurrentState().getTurn().equals(Turn.BLACK)) {
-						System.out.println("Waiting for your opponent move... ");
-					} else if (this.getCurrentState().getTurn().equals(Turn.WHITEWIN)) {
-						System.out.println("YOU WIN!");
-						System.exit(0);
-					} else if (this.getCurrentState().getTurn().equals(Turn.BLACKWIN)) {
-						System.out.println("YOU LOSE!");
-						System.exit(0);
-					} else if (this.getCurrentState().getTurn().equals(Turn.DRAW)) {
-						System.out.println("DRAW!");
-						System.exit(0);
-					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-			}
+			//TODO. INSERITO PER NON AVERE CODICE DIVERSO FRA LE PROVE DEL NERO E DEL BIANCO. UNA VOLTA CAPITO PERCHè C'è
+			// QUELL'ERRORE CON DEPTH 4 POSSIAMO ANCHE ELIMINARE IL METODO faiIlClient
+			faiIlClient(minmax, Turn.WHITE, Turn.BLACK, "YOU WIN!", "YOU LOSE!");
+			return;
 		} else {
-			System.out.println("You are player " + this.getPlayer().toString() + "!");
-			while (true) {
-				try {
-					this.read();
-					System.out.println("Current state:");
-					System.out.println(this.getCurrentState().toString());
-					if (this.getCurrentState().getTurn().equals(Turn.BLACK)) {
 
+			faiIlClient(minmax, Turn.BLACK, Turn.WHITE, "YOU LOSE!", "YOU WIN!");
+		}
+	}
 
-						action = minmax.makeDecision(timeOut, getCurrentState());
-						System.out.println("From: "+ action.getFrom() + ", to=" + action.getTo());
+	private void faiIlClient(Minmax minmax, Turn turnoMio, Turn turnoNemico, String s, String s2) {
 
+		Action action;
+		while (true) {
 
-						this.write(action);
-					} else if (this.getCurrentState().getTurn().equals(Turn.WHITE)) {
-						System.out.println("Waiting for your opponent move... ");
-					} else if (this.getCurrentState().getTurn().equals(Turn.WHITEWIN)) {
-						System.out.println("YOU LOSE!");
-						System.exit(0);
-					} else if (this.getCurrentState().getTurn().equals(Turn.BLACKWIN)) {
-						System.out.println("YOU WIN!");
-						System.exit(0);
-					} else if (this.getCurrentState().getTurn().equals(Turn.DRAW)) {
-						System.out.println("DRAW!");
-						System.exit(0);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.exit(1);
+			try{
+				this.read();
+				System.out.println("Current state:");
+				System.out.println(this.getCurrentState().toString());
+			} catch (Exception e) {
+				System.out.println("Errore nella lettura nuovo stato");
+				e.printStackTrace();
+			}
+
+			try {
+				if (this.getCurrentState().getTurn().equals(turnoMio)) {
+
+					/*****AGGIUNTE*****/
+					action = minmax.makeDecision(timeOut, getCurrentState());
+					System.out.println("From: "+ action.getFrom() + ", to=" + action.getTo());
+					this.write(action);
+					/*******FINE*******/
+
+				} else if (this.getCurrentState().getTurn().equals(turnoNemico)) {
+					System.out.println("Waiting for your opponent move... ");
+				} else if (this.getCurrentState().getTurn().equals(Turn.WHITEWIN)) {
+					System.out.println(s);
+					System.exit(0);
+				} else if (this.getCurrentState().getTurn().equals(Turn.BLACKWIN)) {
+					System.out.println(s2);
+					System.exit(0);
+				} else if (this.getCurrentState().getTurn().equals(Turn.DRAW)) {
+					System.out.println("DRAW!");
+					System.exit(0);
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
 			}
 		}
 	}
