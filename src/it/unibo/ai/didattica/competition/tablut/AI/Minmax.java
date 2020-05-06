@@ -87,9 +87,6 @@ public final class Minmax implements Callable<Action> {
             boolean cancellato = risultato.cancel(true);
 
 
-            //TODO TOGLIERE STA STAMPA QUANDO SI VA IN PRODUZI0NE
-            System.out.println("-----------------------Esito cancellazione: " + cancellato);
-
             //Questo è il metodo che fa terminare il thread che lavora sui callable.
             //Decommentato altrimenti non potrebbero esserci chiamate successive di questo metodo.
             //In alternativa si potrebbe instanziare un ExecutorService ad ogni chiamata, ma per me è inutile,
@@ -123,6 +120,7 @@ public final class Minmax implements Callable<Action> {
             double value = minValue(this.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
 
             //TODO: POTREBBE BASTARE SOLO NEL CICLO DELLA FUNZIONE call();
+            // importante che sia prima dell' if (value > resultValue)  in quanto potrebbe ritornare un valore sballato (vedi minValue e maxValue)
             if(Thread.interrupted()){
                 System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi");
                 return result;
@@ -162,6 +160,13 @@ public final class Minmax implements Callable<Action> {
     }
 
     public double maxValue(State state, double alpha, double beta, int depth) throws Exception{
+
+        //TODO: Lo metto anche qui. Posso ritornare qualsiasi cosa, tanto al ritorno di questa funzione
+        // ci sarà immediatamente un altro controllo sull'interrupted.
+        if(Thread.interrupted()){
+            return 0;
+        }
+
         if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
             return evaluate(state, player);
 
@@ -179,6 +184,13 @@ public final class Minmax implements Callable<Action> {
     }
 
     public double minValue(State state, double alpha, double beta, int depth) throws Exception{
+
+        //TODO: Lo metto anche qui. Posso ritornare qualsiasi cosa, tanto al ritorno di questa funzione
+        // ci sarà immediatamente un altro controllo sull'interrupted.
+        if(Thread.interrupted()){
+            return 0;
+        }
+
         if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
             return evaluate(state, player);
 
