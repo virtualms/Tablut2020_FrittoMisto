@@ -106,9 +106,15 @@ public class TablutFrittoMistoClient extends TablutClient {
 				if (this.getCurrentState().getTurn().equals(turnoMio)) {
 
 					/*****AGGIUNTE*****/
+
+					long start = System.currentTimeMillis();
+
 					action = minmax.makeDecision(timeOut, getCurrentState());
 					System.out.println("From: "+ action.getFrom() + ", to=" + action.getTo());
 					this.write(action);
+
+					long end = System.currentTimeMillis();
+					System.out.println("Ci ho messo " + (end - start) + " millisecs");
 					/*******FINE*******/
 
 				} else if (this.getCurrentState().getTurn().equals(turnoNemico)) {
