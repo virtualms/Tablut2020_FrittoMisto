@@ -41,7 +41,7 @@ public final class Minmax implements Callable<Action> {
         this.player = player;
         this.iterative = iterative;
         this.u = new Utils(true);
-        this.heuristic = new HeuristicFrittoMisto(player);
+        this.heuristic = new HeuristicFrittoMisto(player, currDepthLimit);
 
         this.citadels = new ArrayList<>();
 
@@ -168,7 +168,7 @@ public final class Minmax implements Callable<Action> {
         }
 
         if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
-            return evaluate(state, player);
+            return evaluate(state, player, depth);
 
         double value = Double.NEGATIVE_INFINITY;
         //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
@@ -192,7 +192,7 @@ public final class Minmax implements Callable<Action> {
         }
 
         if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
-            return evaluate(state, player);
+            return evaluate(state, player, depth);
 
         double value = Double.POSITIVE_INFINITY;
 
@@ -209,9 +209,8 @@ public final class Minmax implements Callable<Action> {
 
 
 
-    private double evaluate(State state, State.Turn player){
-        return heuristic.eval(state);
-        //return HeuristicImpl.eval(state, player);
+    private double evaluate(State state, State.Turn player, int depth){
+        return heuristic.eval(state, depth);
     }
 
 

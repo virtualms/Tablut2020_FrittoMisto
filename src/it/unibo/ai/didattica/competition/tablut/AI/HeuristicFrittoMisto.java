@@ -34,6 +34,7 @@ public class HeuristicFrittoMisto implements Heuristic{
     public static final int VICTORY = 5;
     public static final int VICTORY_PATH = 4;
 
+    private int depthLimit;
     private int initialBlack;
     private int initialWhite;
     private Coord castle;
@@ -55,10 +56,11 @@ public class HeuristicFrittoMisto implements Heuristic{
         initPos();
     }
 
-    public HeuristicFrittoMisto(State.Turn playerColor){
+    public HeuristicFrittoMisto(State.Turn playerColor, int depthLimit){
         this.initialWhite = 9;
         this.initialBlack = 16;
         this.playerColor = playerColor;
+        this.depthLimit = depthLimit;
 
         initWeights();
         initPos();
@@ -130,7 +132,7 @@ public class HeuristicFrittoMisto implements Heuristic{
     }
 
     /*****************************************************/
-    public double eval(State state){
+    public double eval(State state, int depth){
 
         int color = ((playerColor == State.Turn.WHITE || playerColor == State.Turn.WHITEWIN) ? 1 : -1); //eval fatta su bianco, per il nero è a specchio (somma zero)
 
@@ -146,7 +148,7 @@ public class HeuristicFrittoMisto implements Heuristic{
                     weight[PAWS_DIFFERENCE]     * lostPaws(blackPieces, whitePieces, state.getTurn())   +
                     weight[PAWS_WHITE]          * whitePieces.size()                                    +
                     weight[VICTORY_PATH]        * victoryPaths(king, blackPieces, whitePieces)          +
-                    weight[VICTORY]             * winCondition(state.getTurn())                         +
+                    weight[VICTORY]             * winCondition(state.getTurn(), depth)                  +
                     weight[PAWS_BLACK]          * blackPieces.size();
 
         return V * color;
@@ -259,13 +261,19 @@ public class HeuristicFrittoMisto implements Heuristic{
 
     /***5***/
     //vittoria o sconfitta
-    private double winCondition(State.Turn turn){
+    private double winCondition(State.Turn turn, int depth){
         if(turn == State.Turn.WHITEWIN)
-            return 1;
+            return 1.0 * depthBonus(depth);
         if(turn == State.Turn.BLACKWIN)
-            return -1;
+            return -1.0 * depthBonus(depth);
 
         return 0;
+    }
+
+    //bonus se le distanza da root è minima
+    private double depthBonus(int depth){
+        //return depth == 0 ? 2 : 1;
+        return (double)(depthLimit - depth)/(double)depthLimit + 1.0;
     }
 
     /**6**/

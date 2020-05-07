@@ -109,7 +109,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 
 					long start = System.currentTimeMillis();
 
-					action = minmax.makeDecision(timeOut, getCurrentState());
+					action = minmax.makeDecision(timeOut, getCurrentState().clone());
 					System.out.println("From: "+ action.getFrom() + ", to=" + action.getTo());
 					this.write(action);
 
