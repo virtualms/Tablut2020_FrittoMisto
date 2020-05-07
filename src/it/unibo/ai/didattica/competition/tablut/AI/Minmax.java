@@ -95,6 +95,7 @@ public final class Minmax implements Callable<Action> {
             //executorService.shutdownNow();
 
             System.out.println("time_out scattato");
+
             return result;
 
         }catch (Exception e) {
@@ -123,7 +124,9 @@ public final class Minmax implements Callable<Action> {
             //TODO: POTREBBE BASTARE SOLO NEL CICLO DELLA FUNZIONE call();
             // importante che sia prima dell' if (value > resultValue)  in quanto potrebbe ritornare un valore sballato (vedi minValue e maxValue)
             if(Thread.interrupted()){
-                System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi");
+                System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----call()");
+                gestisciTerminazione();
+                System.out.println(Thread.currentThread() + "___ : Mi sono fermato----call()");
                 return result;
             }
 
@@ -165,6 +168,10 @@ public final class Minmax implements Callable<Action> {
         //TODO: Lo metto anche qui. Posso ritornare qualsiasi cosa, tanto al ritorno di questa funzione
         // ci sarà immediatamente un altro controllo sull'interrupted.
         if(Thread.interrupted()){
+            System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----maxValue()");
+            gestisciTerminazione();
+            System.out.println(Thread.currentThread() + "___ : Mi sono fermato----maxValue()");
+
             return 0;
         }
 
@@ -184,11 +191,18 @@ public final class Minmax implements Callable<Action> {
         return value;
     }
 
+    private void gestisciTerminazione() {
+        Thread.currentThread().stop();
+    }
+
     public double minValue(State state, double alpha, double beta, int depth) throws Exception{
 
         //TODO: Lo metto anche qui. Posso ritornare qualsiasi cosa, tanto al ritorno di questa funzione
         // ci sarà immediatamente un altro controllo sull'interrupted.
         if(Thread.interrupted()){
+            System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----minValue()");
+            gestisciTerminazione();
+            System.out.println(Thread.currentThread() + "___ : Mi sono fermato----minValue()");
             return 0;
         }
 
