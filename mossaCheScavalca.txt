@@ -1,0 +1,89 @@
+######################################################################################################################à
+-----------------------SERVER---------------------
+-
+W
+Waiting for W...
+Suggested move: Turn: W Pawn from g5 to g7
+OOOBBBOOO
+OOOOBOOOO
+OOOBWWOOO
+OOBOWOOOB
+BBWOKOWBB
+BOOOWOOOB
+OOOOWOOOO
+OOOOBOOOO
+OOOOBBOOO
+-
+W
+Stato:
+OOOBBBOOO
+OOOOBOOOO
+OOOBWWOOO
+OOBOWOOOB
+BBWOKOOBB
+BOOOWOOOB
+OOOOWOWOO
+OOOOBOOOO
+OOOOBBOOO
+-
+B
+Waiting for B...
+Suggested move: Turn: B Pawn from d1 to d4
+May 07, 2020 10:28:29 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Mossa che scavalca una pedina
+TOO MANY ERRORS FOR BLACK PLAYER; PLAYER WHITE WIN!
+it.unibo.ai.didattica.competition.tablut.exceptions.ClimbingException: A pawn is tryng to climb over another pawn: Turn: B Pawn from d1 to d4
+        at it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut.checkMove(GameAshtonTablut.java:255)
+        at it.unibo.ai.didattica.competition.tablut.server.Server.run(Server.java:520)
+        at it.unibo.ai.didattica.competition.tablut.server.Server.main(Server.java:230)
+May 07, 2020 10:28:29 AM it.unibo.ai.didattica.competition.tablut.server.Server run
+WARNING: Chiusura sistema per troppi errori giocatore nero
+
+---------------------------BLACK CLIENT-------------------------------
+W
+Waiting for your opponent move...
+Current state:
+OOOBBBOOO
+OOOWBOOOO
+OOOOWWOOO
+OOBOWOOOB
+BBWOKOWBB
+BOOOWOOOB
+OOOOWOOOO
+OOOOBOOOO
+OOOBBBOOO
+-
+B
+time_out scattato
+From: d9, to=d3
+Ci ho messo 30001 millisecs
+Current state:
+OOOBBBOOO
+OOOOBOOOO
+OOOBWWOOO
+OOBOWOOOB
+BBWOKOWBB
+BOOOWOOOB
+OOOOWOOOO
+OOOOBOOOO
+OOOOBBOOO
+-
+W
+Waiting for your opponent move...
+Current state:
+OOOBBBOOO
+OOOOBOOOO
+OOOBWWOOO
+OOBOWOOOB
+BBWOKOOBB
+BOOOWOOOB
+OOOOWOWOO
+OOOOBOOOO
+OOOOBBOOO
+-
+B
+time_out scattato
+From: d1, to=d4
+Ci ho messo 30002 millisecs
+Errore nella lettura nuovo stato
+java.net.SocketException: Connection reset

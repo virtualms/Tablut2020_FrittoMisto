@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
  */
 public class TablutFrittoMistoClient extends TablutClient {
 
-	private final int timeOut = 58;
+	private final int timeOut = 30;
 //	private final int timeOut = 30;
 //	private final int currDepthLimit = 3;
 	private final int currDepthLimit = 4;
