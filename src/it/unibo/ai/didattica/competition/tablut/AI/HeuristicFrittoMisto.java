@@ -11,21 +11,7 @@ import java.util.stream.Stream;
 
 public class HeuristicFrittoMisto implements Heuristic{
 
-    /* FUNZIONE DI VALUTAZIONE V.
-     * Funzione di valutazione a somma zero( F_bianco + F_nero deve risultare uguale a 0 o si rischiano squilibri ).
-     * V=sum(f_i * w_i)
-     *
-     * 0. Distanza del re da punti di vittoria (distanza di manhattan)
-     * 1. Lati accerchiati del re
-     * 2. Pedine iniziali - pedine finali
-     * 3. Differenza di pedine fra nero e bianco p_b - p_n*(16/9)
-     * 4. Vie di vittoria per il re (corridoi liberi che portano alla vittoria
-     * 5. Altre idee?
-     *
-     * Funzione per calcolare la lista dei pezzi da uno stato.
-     * Distanza (in Coord) da punti di vittoria
-     */
-
+    /***cost***/
     public static final int KING_MANHATTAN = 0;
     public static final int KING_CAPTURED_SIDES = 1;
     public static final int PAWS_DIFFERENCE = 2;
@@ -35,17 +21,15 @@ public class HeuristicFrittoMisto implements Heuristic{
     public static final int VICTORY_PATH = 4;
 
     private int depthLimit;
-    private int initialBlack;
-    private int initialWhite;
+    private double initialBlack;
+    private double initialWhite;
     private Coord castle;
     private List<Coord> citadels;
     private List<Coord> winPos;
     private static double weight[];
     private final State.Turn playerColor; //il colore del client
 
-    /****************const***********************/
-    private final double WIN = 5000;
-
+    /****************WIN***********************/
 
     public HeuristicFrittoMisto(int initialBlack, int initialWhite, State.Turn playerColor) {
         this.initialBlack = initialBlack;
@@ -72,12 +56,15 @@ public class HeuristicFrittoMisto implements Heuristic{
 
     private void initWeights(){
         this.weight = new double[7];
+
+        double pawnsCoef = initialBlack / initialWhite; //(16.0/9.0)
+
         weight[KING_MANHATTAN] = 50;  //manhattan
         weight[KING_CAPTURED_SIDES] = -100;  //king capture
         weight[PAWS_DIFFERENCE] = 100;  //lost pawns
-        weight[PAWS_WHITE] = 100 * (16.0/9.0); //white pieces (difference ?)
+        weight[PAWS_WHITE] = 100 * pawnsCoef; //white pieces (difference ?)
         weight[VICTORY_PATH] = 300;  //victory path
-        weight[VICTORY] = WIN;  //victory
+        weight[VICTORY] = 5000;  //victory
         weight[PAWS_BLACK] = -100; //black pieces
     }
 
@@ -203,7 +190,7 @@ public class HeuristicFrittoMisto implements Heuristic{
 
         double paths=0;
         Optional<Coord> o;
-        //servono a riutilizzare uno stream
+        //servono a "riutilizzare" uno stream
         Supplier<Stream<Coord>> sup1, sup2;
 
         sup1 = () -> Stream.concat(blackPieces.stream(), whitePieces.stream());
@@ -253,7 +240,6 @@ public class HeuristicFrittoMisto implements Heuristic{
     private List<Coord> victoryRoads(Coord king){
 
         //tutte le victory pos accessibili dal re
-
         return winPos.stream().
                 filter(w -> (king.getRow() == w.getRow() || king.getCol() == w.getCol())).
                 collect(Collectors.toList());

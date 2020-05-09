@@ -21,7 +21,7 @@ import java.net.UnknownHostException;
 public class TablutFrittoMistoClient extends TablutClient {
 
 //	private final int timeOut = 58;
-	private final int timeOut = 10;
+	private final int timeOut = 58;
 //	private final int currDepthLimit = 3;
 	private final int currDepthLimit = 4;
 	private Game game;
@@ -110,7 +110,6 @@ public class TablutFrittoMistoClient extends TablutClient {
 					long start = System.currentTimeMillis();
 
 					action = minmax.makeDecision(timeOut, getCurrentState().clone());
-					System.out.println("From: "+ action.getFrom() + ", to=" + action.getTo());
 					this.write(action);
 
 					long end = System.currentTimeMillis();

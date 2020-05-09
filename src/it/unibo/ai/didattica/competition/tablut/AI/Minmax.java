@@ -5,6 +5,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,10 @@ public final class Minmax implements Callable<Action> {
     protected int currDepthLimit;
     private State.Turn player;
     private Utils u;
+
+    //prints
+    private static DecimalFormat df2 = new DecimalFormat("#.##");
+    private final boolean canPrint=true;
 
     //TODO: è per limitare, eventualmente, la ricerca soltanto al primo livello
     private boolean iterative;
@@ -65,25 +70,19 @@ public final class Minmax implements Callable<Action> {
 
     public Action makeDecision(int timeOut, State stato) throws IOException {
 
-        //In questo modo per passare i parametri a call()
         currentState = stato;
 
         //metto in esecuzione il task (viene chiamata "call()")
-//        Future<Action> risultato = executorService.submit(this);
         Future<Action> risultato = executorService.submit(this);
 
-        //TODO: Come inizializzare una azione coerente qui? Per non metterla a null
         result = null;
 
         try {
             result = risultato.get(timeOut, TimeUnit.SECONDS);
+            System.out.println("Selected: " + result.toString());
         } catch (TimeoutException e) {
 
-            //TODO COMMENTATO
-            //new File("cane.txt").createNewFile();
-
             //importante altrimenti il thread che si occupa della call() continua ad eseguire
-            //TODO ATTENZIONEEEEEE! NON SI TORNA UN RISOLTATO A VOLTE SE TIMEOUT TROPPO BASSO, BISOGNA TARARE BENE DEPTH O CAMBIARE
             boolean cancellato = risultato.cancel(true);
 
 
@@ -95,7 +94,8 @@ public final class Minmax implements Callable<Action> {
             //executorService.shutdownNow();
 
             System.out.println("time_out scattato");
-
+            if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
+            if(canPrint) System.out.println("Selected: {" + result.toString() + "}");
             return result;
 
         }catch (Exception e) {
@@ -110,12 +110,13 @@ public final class Minmax implements Callable<Action> {
 
         double resultValue = Double.NEGATIVE_INFINITY;
 
-        //TODO: Collection più performante?
         List<Action> azioni = u.getSuccessors(currentState);
         Collections.shuffle(azioni);
 
-        result = azioni.get(0); //INIZIALIZZO RESULT CON UNA MOSSA A CASO
+        //INIZIALIZZO RESULT CON UNA MOSSA A CASO
+        result = azioni.get(0);
 
+        if(canPrint) System.out.println("----------------------------------------------------------------------------------");
         for (Action action : azioni) {
 
             //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
@@ -131,9 +132,17 @@ public final class Minmax implements Callable<Action> {
             }
 
             //TODO COSI' SALVIAMO SOLO UN RESULT, FORSE SERVE UNA LISTA CON TUTTE LE AZIONI A PARIMERITO DI VALUE
-            if (value > resultValue) {
-                result = action;
-                resultValue = value;
+            synchronized(this) {
+                if (value > resultValue) {
+                    result = action;
+                    resultValue = value;
+                }
+
+                //TODO per selezionare un valore random
+//                else if(value == resultValue && (System.currentTimeMillis() % 3 == 0)){
+//                    result = action;
+//                    resultValue = value;
+//                }
             }
 
 
@@ -159,7 +168,10 @@ public final class Minmax implements Callable<Action> {
 //                }
 //                return true;
 //            }
-        }
+            if(canPrint) System.out.println("A={" + action.toString() + "}; V=" + df2.format(value));
+        }//for
+        if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
+
         return result;
     }
 
@@ -179,9 +191,8 @@ public final class Minmax implements Callable<Action> {
             return evaluate(state, player, depth);
 
         double value = Double.NEGATIVE_INFINITY;
-        //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
-        for (Action action : u.getSuccessors(state)) {
 
+        for (Action action : u.getSuccessors(state)) {
             //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
             value = Math.max(value, minValue(this.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value >= beta)
@@ -229,9 +240,7 @@ public final class Minmax implements Callable<Action> {
     }
 
 
-    /***********************++*************************++**********************************/
-    /***********************++CHECK NON ROMPI CAZZO++**************************************/
-    /***********************++*************************++*********************************/
+    /**************************************CHECK******************************************/
 
     private State movePawn(State state, Action a) {
         State.Pawn pawn = state.getPawn(a.getRowFrom(), a.getColumnFrom());
