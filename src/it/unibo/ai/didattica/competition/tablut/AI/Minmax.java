@@ -22,23 +22,25 @@ public final class Minmax implements Callable<Action> {
     protected int currDepthLimit;
     private State.Turn player;
     private Utils u;
+    private final List<String> citadels;
+    private final Heuristic heuristic;
 
     //prints
     private static final DecimalFormat df2 = new DecimalFormat("#.##");
     private static Random rand = new Random();
-    private final boolean canPrint=true;
+    private final boolean canPrint = true;
 
     //TODO: è per limitare, eventualmente, la ricerca soltanto al primo livello
     private boolean iterative;
 
-//  Come parametri per la call
+    //  Come parametri per la call
     private State currentState;
 
+    //risultati
     private static Action result;
     private static List<Action> possibleActions;
 
-    private final List<String> citadels;
-    private final Heuristic heuristic;
+
 
 
 //     Può essere inserito oppure no, vediamo come si comporta il timeout
@@ -83,7 +85,7 @@ public final class Minmax implements Callable<Action> {
 
         try {
             result = risultato.get(timeOut, TimeUnit.SECONDS);
-            System.out.println("Selected: " + result.toString());
+            System.out.println("Selected: {" + result.toString() + "}");
         } catch (TimeoutException e) {
 
             //importante altrimenti il thread che si occupa della call() continua ad eseguire
@@ -98,10 +100,12 @@ public final class Minmax implements Callable<Action> {
             //executorService.shutdownNow();
 
             System.out.println("####### time_out scattato #######");
-            result = possibleActions.get(rand.nextInt(possibleActions.size()));
+
+            if(!possibleActions.isEmpty())
+                result = possibleActions.get(rand.nextInt(possibleActions.size()));
 
             if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
-            if(canPrint) System.out.println("Selected: {" + result.toString() + "}");
+            System.out.println("Selected: {" + result.toString() + "}");
 
             return result;
 
@@ -121,8 +125,9 @@ public final class Minmax implements Callable<Action> {
         Collections.shuffle(azioni);
 
         //INIZIALIZZO RESULT CON UNA MOSSA A CASO
-//        result = azioni.get(0);
+        result = azioni.get(0);
         possibleActions.add(azioni.get(0));
+
 
         if(canPrint) System.out.println("----------------------------------------------------------------------------------");
         for (Action action : azioni) {
@@ -141,6 +146,7 @@ public final class Minmax implements Callable<Action> {
 
                 //salvo result
                 if (value > resultValue) {
+                    result = action;
                     possibleActions.clear();
                     possibleActions.add(action);
                     resultValue = value;
@@ -153,7 +159,7 @@ public final class Minmax implements Callable<Action> {
                 }
 
 
-            if(canPrint) System.out.println("A={" + action.toString() + "}; V=" + df2.format(value) + ".    CURRENT BESTS: {" + possibleActions.toString() + "}");
+            if(canPrint) System.out.println("A={" + action.toString() + "}; V=" + df2.format(value) + ".    CURRENT BESTS: " + possibleActions.toString() + "");
         }//for
         if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
 
