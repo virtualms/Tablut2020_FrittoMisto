@@ -9,13 +9,14 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.*;
 
 
 public final class Minmax implements Callable<Action> {
 
     //TODO: Controllare, per avere conferma, che questo executor è quello più performante.
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     public static Game game;
     protected int currDepthLimit;
@@ -23,7 +24,7 @@ public final class Minmax implements Callable<Action> {
     private Utils u;
 
     //prints
-    private static DecimalFormat df2 = new DecimalFormat("#.##");
+    private static final DecimalFormat df2 = new DecimalFormat("#.##");
     private final boolean canPrint=true;
 
     //TODO: è per limitare, eventualmente, la ricerca soltanto al primo livello
@@ -32,11 +33,10 @@ public final class Minmax implements Callable<Action> {
 //  Come parametri per la call
     private State currentState;
 
-    //ZIO BOYS DEVE ESSERE STATIC STA ROBA. ALTRIMENTI NON è CONDIVISA TRA LE ISTANZE DI STA CLASSE
     private static Action result;
 
-    private List<String> citadels;
-    private Heuristic heuristic;
+    private final List<String> citadels;
+    private final Heuristic heuristic;
 
 
 //     Può essere inserito oppure no, vediamo come si comporta il timeout
@@ -110,7 +110,9 @@ public final class Minmax implements Callable<Action> {
 
         double resultValue = Double.NEGATIVE_INFINITY;
 
+        Random rand = new Random();
         List<Action> azioni = u.getSuccessors(currentState);
+        List<Action> possibleActions = new ArrayList<>();
         Collections.shuffle(azioni);
 
         //INIZIALIZZO RESULT CON UNA MOSSA A CASO
@@ -131,22 +133,31 @@ public final class Minmax implements Callable<Action> {
                 return result;
             }
 
-            //TODO COSI' SALVIAMO SOLO UN RESULT, FORSE SERVE UNA LISTA CON TUTTE LE AZIONI A PARIMERITO DI VALUE
-            synchronized(this) {
+                //salvo result
                 if (value > resultValue) {
                     result = action;
+                    possibleActions.clear();
+                    possibleActions.add(action);
                     resultValue = value;
                 }
 
-                //TODO per selezionare un valore random
-//                else if(value == resultValue && (System.currentTimeMillis() % 3 == 0)){
-//                    result = action;
-//                    resultValue = value;
-//                }
-            }
+                //per selezionare un valore random fra quelli di uguale value
+                else if(value == resultValue){
+                    possibleActions.add(action);
+                    result = possibleActions.get(rand.nextInt(possibleActions.size() - 1));
+                    resultValue = value;
+                }
 
 
-            //Questo è il codice che esegue la .cancel() (in FutureTask.java)
+            if(canPrint) System.out.println("A={" + action.toString() + "}; V=" + df2.format(value) + ".    CURRENT BEST: {" + result.toString() + "}");
+        }//for
+        if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
+
+        return result;
+    }
+
+    /****cancel*****/
+    //Questo è il codice che esegue la .cancel() (in FutureTask.java)
 
 //            public boolean cancel(boolean mayInterruptIfRunning) {
 //                if (!(state == NEW &&
@@ -168,12 +179,6 @@ public final class Minmax implements Callable<Action> {
 //                }
 //                return true;
 //            }
-            if(canPrint) System.out.println("A={" + action.toString() + "}; V=" + df2.format(value));
-        }//for
-        if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
-
-        return result;
-    }
 
     public double maxValue(State state, double alpha, double beta, int depth) throws Exception{
 

@@ -26,7 +26,7 @@ public class HeuristicFrittoMisto implements Heuristic{
     private Coord castle;
     private List<Coord> citadels;
     private List<Coord> winPos;
-    private static double weight[];
+    private static double [] weight;
     private final State.Turn playerColor; //il colore del client
 
     /****************WIN***********************/
@@ -55,7 +55,7 @@ public class HeuristicFrittoMisto implements Heuristic{
     }
 
     private void initWeights(){
-        this.weight = new double[7];
+        weight = new double[7];
 
         double pawnsCoef = initialBlack / initialWhite; //(16.0/9.0)
 
@@ -145,7 +145,7 @@ public class HeuristicFrittoMisto implements Heuristic{
 
 
 
-    /***********************FUNC*************************/
+    /*-*********************FUNC*************************/
     /**0**/
     private double kingManhattan(Coord king){
         //6 massima distanza da win position
@@ -170,7 +170,6 @@ public class HeuristicFrittoMisto implements Heuristic{
     }
 
     /**2**/
-    //TODO DA RENDERE UNA SOMMA SENZA COEFF COME PER GLI ALTRI
     private double lostPaws(List<Coord> black, List<Coord> white, State.Turn turn){
 //        double coeff = 16/9; //per equilibrare la situazione di pezzi
 //        return - (coeff)*(initialWhite - white.size()) + (initialBlack - black.size());
