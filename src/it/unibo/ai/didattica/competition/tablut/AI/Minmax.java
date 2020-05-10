@@ -25,6 +25,7 @@ public final class Minmax implements Callable<Action> {
 
     //prints
     private static final DecimalFormat df2 = new DecimalFormat("#.##");
+    private static Random rand = new Random();
     private final boolean canPrint=true;
 
     //TODO: è per limitare, eventualmente, la ricerca soltanto al primo livello
@@ -34,6 +35,7 @@ public final class Minmax implements Callable<Action> {
     private State currentState;
 
     private static Action result;
+    private static List<Action> possibleActions;
 
     private final List<String> citadels;
     private final Heuristic heuristic;
@@ -49,6 +51,7 @@ public final class Minmax implements Callable<Action> {
         this.heuristic = new HeuristicFrittoMisto(player, currDepthLimit);
 
         this.citadels = new ArrayList<>();
+        possibleActions = new ArrayList<>();
 
         this.citadels.add("a4");
         this.citadels.add("a5");
@@ -76,6 +79,7 @@ public final class Minmax implements Callable<Action> {
         Future<Action> risultato = executorService.submit(this);
 
         result = null;
+        possibleActions.clear();
 
         try {
             result = risultato.get(timeOut, TimeUnit.SECONDS);
@@ -93,9 +97,12 @@ public final class Minmax implements Callable<Action> {
             //i thread verrebbero inizializzati ogni volta con perdita di prestazioni.
             //executorService.shutdownNow();
 
-            System.out.println("time_out scattato");
+            System.out.println("####### time_out scattato #######");
+            result = possibleActions.get(rand.nextInt(possibleActions.size()));
+
             if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
             if(canPrint) System.out.println("Selected: {" + result.toString() + "}");
+
             return result;
 
         }catch (Exception e) {
@@ -110,13 +117,12 @@ public final class Minmax implements Callable<Action> {
 
         double resultValue = Double.NEGATIVE_INFINITY;
 
-        Random rand = new Random();
         List<Action> azioni = u.getSuccessors(currentState);
-        List<Action> possibleActions = new ArrayList<>();
         Collections.shuffle(azioni);
 
         //INIZIALIZZO RESULT CON UNA MOSSA A CASO
-        result = azioni.get(0);
+//        result = azioni.get(0);
+        possibleActions.add(azioni.get(0));
 
         if(canPrint) System.out.println("----------------------------------------------------------------------------------");
         for (Action action : azioni) {
@@ -130,12 +136,11 @@ public final class Minmax implements Callable<Action> {
                 System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----call()");
                 gestisciTerminazione();
                 System.out.println(Thread.currentThread() + "___ : Mi sono fermato----call()");
-                return result;
+                return possibleActions.get(rand.nextInt(possibleActions.size()));
             }
 
                 //salvo result
                 if (value > resultValue) {
-                    result = action;
                     possibleActions.clear();
                     possibleActions.add(action);
                     resultValue = value;
@@ -144,16 +149,17 @@ public final class Minmax implements Callable<Action> {
                 //per selezionare un valore random fra quelli di uguale value
                 else if(value == resultValue){
                     possibleActions.add(action);
-                    result = possibleActions.get(rand.nextInt(possibleActions.size() - 1));
                     resultValue = value;
                 }
 
 
-            if(canPrint) System.out.println("A={" + action.toString() + "}; V=" + df2.format(value) + ".    CURRENT BEST: {" + result.toString() + "}");
+            if(canPrint) System.out.println("A={" + action.toString() + "}; V=" + df2.format(value) + ".    CURRENT BESTS: {" + possibleActions.toString() + "}");
         }//for
         if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
 
-        return result;
+
+        //torno un risultato random tra i migliori
+        return possibleActions.get(rand.nextInt(possibleActions.size()));
     }
 
     /****cancel*****/
