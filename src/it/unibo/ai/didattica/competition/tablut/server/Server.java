@@ -124,7 +124,7 @@ public class Server implements Runnable {
 		int repeated = 0;
 		int errors = 0;
 		int gameChosen = 4;
-		boolean enableGui = true;
+		boolean enableGui = false;
 
 		String usage = "Usage: java Server [-t <time>] [-c <cache>] [-e <errors>] [-s <repeatedState>] [-r <game rules>] [-g <enableGUI>]\n"
 				+ "\tenableGUI must be >0 for enabling it; default 1"

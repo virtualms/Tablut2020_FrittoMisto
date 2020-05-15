@@ -105,6 +105,7 @@ public final class Minmax implements Callable<Action> {
                 result = possibleActions.get(rand.nextInt(possibleActions.size()));
 
             if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
+
             System.out.println("Selected: {" + result.toString() + "}");
 
             return result;
@@ -160,6 +161,7 @@ public final class Minmax implements Callable<Action> {
 
 
             if(canPrint) System.out.println("A={" + action.toString() + "}; V=" + df2.format(value) + ".    CURRENT BESTS: " + possibleActions.toString() + "");
+
         }//for
         if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
 
@@ -200,7 +202,6 @@ public final class Minmax implements Callable<Action> {
             System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----maxValue()");
             gestisciTerminazione();
             System.out.println(Thread.currentThread() + "___ : Mi sono fermato----maxValue()");
-
             return 0;
         }
 

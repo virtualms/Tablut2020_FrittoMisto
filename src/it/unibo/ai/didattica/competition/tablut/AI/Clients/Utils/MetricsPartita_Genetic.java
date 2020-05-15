@@ -2,7 +2,7 @@ package it.unibo.ai.didattica.competition.tablut.AI.Clients.Utils;
 
 public class MetricsPartita_Genetic {
 
-    private boolean draw;
+    private boolean draw = false;
     private boolean victory = false;
     private double opponentPawsEaten = 0;
     private double minePawsLosts = 0;
