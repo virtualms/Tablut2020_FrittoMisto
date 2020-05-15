@@ -5,31 +5,42 @@ import it.unibo.ai.didattica.competition.tablut.domain.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.*;
 
 
 public final class Minmax implements Callable<Action> {
 
     //TODO: Controllare, per avere conferma, che questo executor è quello più performante.
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     public static Game game;
     protected int currDepthLimit;
     private State.Turn player;
-    private Utils u = null;
+    private Utils u;
+    private final List<String> citadels;
+    private final Heuristic heuristic;
+
+    //prints
+    private static final DecimalFormat df2 = new DecimalFormat("#.##");
+    private static Random rand = new Random();
+    private final boolean canPrint = true;
 
     //TODO: è per limitare, eventualmente, la ricerca soltanto al primo livello
     private boolean iterative;
 
-//  Come parametri per la call
+    //  Come parametri per la call
     private State currentState;
-    private Action result;
-    private List<String> citadels;
 
-    private Heuristic heuristic;
+    //risultati
+    private static Action result;
+    private static List<Action> possibleActions;
+
+
 
 
 //     Può essere inserito oppure no, vediamo come si comporta il timeout
@@ -39,9 +50,10 @@ public final class Minmax implements Callable<Action> {
         this.player = player;
         this.iterative = iterative;
         this.u = new Utils(true);
-        this.heuristic = new HeuristicFrittoMisto(player);
+        this.heuristic = new HeuristicFrittoMisto(player, currDepthLimit);
 
         this.citadels = new ArrayList<>();
+        possibleActions = new ArrayList<>();
 
         this.citadels.add("a4");
         this.citadels.add("a5");
@@ -63,25 +75,22 @@ public final class Minmax implements Callable<Action> {
 
     public Action makeDecision(int timeOut, State stato) throws IOException {
 
-        //In questo modo per passare i parametri a call()
-        currentState = stato.clone();
+        currentState = stato;
 
         //metto in esecuzione il task (viene chiamata "call()")
         Future<Action> risultato = executorService.submit(this);
 
-        //TODO: Come inizializzare una azione coerente qui? Per non metterla a null
         result = null;
+        possibleActions.clear();
 
         try {
             result = risultato.get(timeOut, TimeUnit.SECONDS);
+            System.out.println("Selected: {" + result.toString() + "}");
         } catch (TimeoutException e) {
 
-            //TODO COMMENTATO
-            //new File("cane.txt").createNewFile();
-
             //importante altrimenti il thread che si occupa della call() continua ad eseguire
-            //TODO ATTENZIONEEEEEE! NON SI TORNA UN RISOLTATO A VOLTE SE TIMEOUT TROPPO BASSO, BISOGNA TARARE BENE DEPTH O CAMBIARE
-            risultato.cancel(true);
+            boolean cancellato = risultato.cancel(true);
+
 
             //Questo è il metodo che fa terminare il thread che lavora sui callable.
             //Decommentato altrimenti non potrebbero esserci chiamate successive di questo metodo.
@@ -90,7 +99,14 @@ public final class Minmax implements Callable<Action> {
             //i thread verrebbero inizializzati ogni volta con perdita di prestazioni.
             //executorService.shutdownNow();
 
-            System.out.println("time_out scattato");
+            System.out.println("####### time_out scattato #######");
+
+            if(!possibleActions.isEmpty())
+                result = possibleActions.get(rand.nextInt(possibleActions.size()));
+
+            if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
+            System.out.println("Selected: {" + result.toString() + "}");
+
             return result;
 
         }catch (Exception e) {
@@ -105,34 +121,96 @@ public final class Minmax implements Callable<Action> {
 
         double resultValue = Double.NEGATIVE_INFINITY;
 
-        //TODO: Collection più performante?
         List<Action> azioni = u.getSuccessors(currentState);
-
-        //TODO FACCIO SHUFFLE O LE PARTITE SONO TUTTE UGUALI (ANDREBBE FATTO IN UTILITY, DANDO PRIORITA' ALLE MOSSE DEL RE (?))
         Collections.shuffle(azioni);
-        result = azioni.get(0); //INIZIALIZZO RESULT CON UNA MOSSA A CASO
 
+        //INIZIALIZZO RESULT CON UNA MOSSA A CASO
+        result = azioni.get(0);
+        possibleActions.add(azioni.get(0));
+
+
+        if(canPrint) System.out.println("----------------------------------------------------------------------------------");
         for (Action action : azioni) {
 
+            //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
             double value = minValue(this.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
 
-            //TODO COSI' SALVIAMO SOLO UN RESULT, FORSE SERVE UNA LISTA CON TUTTE LE AZIONI A PARIMERITO DI VALUE
-            if (value > resultValue) {
-                result = action;
-                resultValue = value;
+            //TODO: POTREBBE BASTARE SOLO NEL CICLO DELLA FUNZIONE call();
+            // importante che sia prima dell' if (value > resultValue)  in quanto potrebbe ritornare un valore sballato (vedi minValue e maxValue)
+            if(Thread.interrupted()){
+                System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----call()");
+                gestisciTerminazione();
+                System.out.println(Thread.currentThread() + "___ : Mi sono fermato----call()");
+                return possibleActions.get(rand.nextInt(possibleActions.size()));
             }
-        }
-        return result;
+
+                //salvo result
+                if (value > resultValue) {
+                    result = action;
+                    possibleActions.clear();
+                    possibleActions.add(action);
+                    resultValue = value;
+                }
+
+                //per selezionare un valore random fra quelli di uguale value
+                else if(value == resultValue){
+                    possibleActions.add(action);
+                    resultValue = value;
+                }
+
+
+            if(canPrint) System.out.println("A={" + action.toString() + "}; V=" + df2.format(value) + ".    CURRENT BESTS: " + possibleActions.toString() + "");
+        }//for
+        if(canPrint) System.out.println("----------------------------------------------------------------------------------\n");
+
+
+        //torno un risultato random tra i migliori
+        return possibleActions.get(rand.nextInt(possibleActions.size()));
     }
 
+    /****cancel*****/
+    //Questo è il codice che esegue la .cancel() (in FutureTask.java)
+
+//            public boolean cancel(boolean mayInterruptIfRunning) {
+//                if (!(state == NEW &&
+//                        UNSAFE.compareAndSwapInt(this, stateOffset, NEW,
+//                                mayInterruptIfRunning ? INTERRUPTING : CANCELLED)))
+//                    return false;
+//                try {    // in case call to interrupt throws exception
+//                    if (mayInterruptIfRunning) {
+//                        try {
+//                            Thread t = runner;
+//                            if (t != null)
+//                                t.interrupt();
+//                        } finally { // final state
+//                            UNSAFE.putOrderedInt(this, stateOffset, INTERRUPTED);
+//                        }
+//                    }
+//                } finally {
+//                    finishCompletion();
+//                }
+//                return true;
+//            }
+
     public double maxValue(State state, double alpha, double beta, int depth) throws Exception{
+
+        //TODO: Lo metto anche qui. Posso ritornare qualsiasi cosa, tanto al ritorno di questa funzione
+        // ci sarà immediatamente un altro controllo sull'interrupted.
+        if(Thread.interrupted()){
+            System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----maxValue()");
+            gestisciTerminazione();
+            System.out.println(Thread.currentThread() + "___ : Mi sono fermato----maxValue()");
+
+            return 0;
+        }
+
         if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
-            return evaluate(state, player);
+            return evaluate(state, player, depth);
 
         double value = Double.NEGATIVE_INFINITY;
-        //TODO: DEVONO ESSERE RESTITUTE TUTTE LE AZIONI O SOLO QUELLE POSSIBILI PER UN DETERMINATO GIOCATORE??
-        for (Action action : u.getSuccessors(state)) {
 
+        for (Action action : u.getSuccessors(state)) {
+            //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
             value = Math.max(value, minValue(this.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value >= beta)
                 return value;
@@ -141,14 +219,29 @@ public final class Minmax implements Callable<Action> {
         return value;
     }
 
+    private void gestisciTerminazione() {
+        Thread.currentThread().stop();
+    }
+
     public double minValue(State state, double alpha, double beta, int depth) throws Exception{
+
+        //TODO: Lo metto anche qui. Posso ritornare qualsiasi cosa, tanto al ritorno di questa funzione
+        // ci sarà immediatamente un altro controllo sull'interrupted.
+        if(Thread.interrupted()){
+            System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----minValue()");
+            gestisciTerminazione();
+            System.out.println(Thread.currentThread() + "___ : Mi sono fermato----minValue()");
+            return 0;
+        }
+
         if (state.getTurn() == State.Turn.BLACKWIN || state.getTurn() == State.Turn.WHITEWIN || depth >= currDepthLimit)
-            return evaluate(state, player);
+            return evaluate(state, player, depth);
 
         double value = Double.POSITIVE_INFINITY;
 
         for (Action action : u.getSuccessors(state)) {
 
+            //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
             value = Math.min(value, maxValue(this.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value <= alpha)
                 return value;
@@ -159,15 +252,12 @@ public final class Minmax implements Callable<Action> {
 
 
 
-    private double evaluate(State state, State.Turn player){
-        return heuristic.eval(state);
-        //return HeuristicImpl.eval(state, player);
+    private double evaluate(State state, State.Turn player, int depth){
+        return heuristic.eval(state, depth);
     }
 
 
-    /***********************++*************************++**********************************/
-    /***********************++CHECK NON ROMPI CAZZO++**************************************/
-    /***********************++*************************++*********************************/
+    /**************************************CHECK******************************************/
 
     private State movePawn(State state, Action a) {
         State.Pawn pawn = state.getPawn(a.getRowFrom(), a.getColumnFrom());

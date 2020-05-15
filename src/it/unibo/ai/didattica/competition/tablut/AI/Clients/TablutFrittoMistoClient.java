@@ -1,6 +1,5 @@
 package it.unibo.ai.didattica.competition.tablut.AI.Clients;
 
-import it.unibo.ai.didattica.competition.tablut.AI.Clients.Utils.MetricsPartita_Genetic;
 import it.unibo.ai.didattica.competition.tablut.AI.Minmax;
 import it.unibo.ai.didattica.competition.tablut.client.TablutClient;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
@@ -13,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
-import java.time.LocalTime;
 
 /**
  * 
@@ -22,18 +20,12 @@ import java.time.LocalTime;
  */
 public class TablutFrittoMistoClient extends TablutClient {
 
-	private static final int NUMERO_INIZIALE_NERI = 16 ;
-	private static final int NUMERO_INIZIALE_BIANCHI = 8; // + KING
-
-
-	private static MetricsPartita_Genetic metrics;
+//	private final int timeOut = 30;
 	private final int timeOut = 58;
-	private final int currDepthLimit = 2;
+//	private final int currDepthLimit = 4;
+	private final int currDepthLimit = 3;
 	private Game game;
 	private static final String NAME = "FrittoMisto";
-
-	//FOR GENETIC
-	private long matchTime;
 
 //	TODO: Presi dal random. Eventualmente da sistemare
 //	public TablutFrittoMistoClient(String player, String name, int gameChosen, int timeout, String ipAddress) throws UnknownHostException, IOException {
@@ -59,7 +51,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 		this.game = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
 	}
 
-	public static MetricsPartita_Genetic main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
+	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
 
 		if (args.length == 0) {
 			System.out.println("You must specify which player you are (WHITE or BLACK)!");
@@ -71,16 +63,10 @@ public class TablutFrittoMistoClient extends TablutClient {
 
 		client.run();
 
-		//FOR GENETICS
-		return metrics;
-
 	}
 
 	@Override
 	public void run() {
-
-		Long startTimeMills = System.currentTimeMillis();
-
 		System.out.println("You are player " + this.getPlayer().toString() + "!");
 		Action action;
 		Minmax minmax = new Minmax(game, currDepthLimit, getPlayer(), true);
@@ -92,164 +78,61 @@ public class TablutFrittoMistoClient extends TablutClient {
 		}
 
 		if (this.getPlayer() == Turn.WHITE) {
-			System.out.println("You are player " + this.getPlayer().toString() + "!");
-			while (true) {
-				try {
-					this.read();
-
-					System.out.println("Current state:");
-					System.out.println(this.getCurrentState().toString());
-					if (this.getCurrentState().getTurn().equals(Turn.WHITE)) {
-
-
-						Long start = System.currentTimeMillis();
-
-						/*****AGGIUNTE*****/
-						action = minmax.makeDecision(timeOut, getCurrentState());
-
-						Long end = System.currentTimeMillis();
-
-						System.out.println("tempo impegato: __" + (end - start) + "__ millisecondi");
-
-						this.write(action);
-					} else if (this.getCurrentState().getTurn().equals(Turn.BLACK)) {
-						System.out.println("Waiting for your opponent move... ");
-					} else if (this.getCurrentState().getTurn().equals(Turn.WHITEWIN)) {
-
-
-						System.out.println("YOU WIN!");
-						//added
-						printMatchTime(startTimeMills);
-						aggiornaMetrics(getCurrentState());
-						
-						/*System.exit(0)*/ return;
-					} else if (this.getCurrentState().getTurn().equals(Turn.BLACKWIN)) {
-
-						System.out.println("YOU LOSE!");
-						//added
-						printMatchTime(startTimeMills);
-						aggiornaMetrics(getCurrentState());
-
-
-						/*System.exit(0)*/ return;
-					} else if (this.getCurrentState().getTurn().equals(Turn.DRAW)) {
-
-
-						System.out.println("DRAW!");
-						//added
-						printMatchTime(startTimeMills);
-						aggiornaMetrics(getCurrentState());
-
-						/*System.exit(0)*/ return;
-					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					/*System.exit(1)*/ return;
-				}
-			}
+			//TODO. INSERITO PER NON AVERE CODICE DIVERSO FRA LE PROVE DEL NERO E DEL BIANCO. UNA VOLTA CAPITO PERCHè C'è
+			// QUELL'ERRORE CON DEPTH 4 POSSIAMO ANCHE ELIMINARE IL METODO faiIlClient
+			faiIlClient(minmax, Turn.WHITE, Turn.BLACK, "YOU WIN!", "YOU LOSE!");
+			return;
 		} else {
-			System.out.println("You are player " + this.getPlayer().toString() + "!");
-			while (true) {
-				try {
-					this.read();
-					System.out.println("Current state:");
-					System.out.println(this.getCurrentState().toString());
-					if (this.getCurrentState().getTurn().equals(Turn.BLACK)) {
 
+			faiIlClient(minmax, Turn.BLACK, Turn.WHITE, "YOU LOSE!", "YOU WIN!");
+		}
+	}
 
-						/*****AGGIUNTE*****/
-						Long start = System.currentTimeMillis();
+	private void faiIlClient(Minmax minmax, Turn turnoMio, Turn turnoNemico, String s, String s2) {
 
-						action = minmax.makeDecision(timeOut, getCurrentState());
+		Action action;
+		while (true) {
 
-						Long end = System.currentTimeMillis();
+			try{
+				this.read();
+				System.out.println("Current state:");
+				System.out.println(this.getCurrentState().toString());
+			} catch (Exception e) {
+				System.out.println("Errore nella lettura nuovo stato");
+				e.printStackTrace();
+			}
 
-						System.out.println("tempo impegato: __" + (end - start) + "__ millisecondi");
+			try {
+				if (this.getCurrentState().getTurn().equals(turnoMio)) {
 
+					/*****AGGIUNTE*****/
 
-						this.write(action);
-					} else if (this.getCurrentState().getTurn().equals(Turn.WHITE)) {
-						System.out.println("Waiting for your opponent move... ");
-					} else if (this.getCurrentState().getTurn().equals(Turn.WHITEWIN)) {
-						System.out.println("YOU LOSE!");
+					long start = System.currentTimeMillis();
 
-						//added
-						printMatchTime(startTimeMills);
-						aggiornaMetrics(getCurrentState());
+					action = minmax.makeDecision(timeOut, getCurrentState().clone());
+					this.write(action);
 
-						/*System.exit(0)*/ return;
-					} else if (this.getCurrentState().getTurn().equals(Turn.BLACKWIN)) {
-						System.out.println("YOU WIN!");
+					long end = System.currentTimeMillis();
+					System.out.println("Ci ho messo " + (end - start) + " millisecs");
+					/*******FINE*******/
 
-						//added
-						printMatchTime(startTimeMills);
-						aggiornaMetrics(getCurrentState());
-
-						/*System.exit(0)*/ return;
-					} else if (this.getCurrentState().getTurn().equals(Turn.DRAW)) {
-						System.out.println("DRAW!");
-
-						//added
-						printMatchTime(startTimeMills);
-						aggiornaMetrics(getCurrentState());
-
-						/*System.exit(0)*/ return;
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					/*System.exit(1)*/ return;
+				} else if (this.getCurrentState().getTurn().equals(turnoNemico)) {
+					System.out.println("Waiting for your opponent move... ");
+				} else if (this.getCurrentState().getTurn().equals(Turn.WHITEWIN)) {
+					System.out.println(s);
+					System.exit(0);
+				} else if (this.getCurrentState().getTurn().equals(Turn.BLACKWIN)) {
+					System.out.println(s2);
+					System.exit(0);
+				} else if (this.getCurrentState().getTurn().equals(Turn.DRAW)) {
+					System.out.println("DRAW!");
+					System.exit(0);
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
 			}
 		}
-	}
-
-	private void aggiornaMetrics(State currentState) {
-
-		metrics = new MetricsPartita_Genetic();
-
-		boolean victory = false;
-		double opponentPawsEaten = 0;
-		double minePawsLosts = 0;
-
-		if(super.getPlayer() == Turn.BLACK){
-
-			minePawsLosts = (NUMERO_INIZIALE_NERI - currentState.getNumberOf(State.Pawn.BLACK)); //TODO CONTROLLARE CHE NON SIA DISPONIBILE GIA' QUESTA CONSTANTE
-			//percentuale
-			minePawsLosts = minePawsLosts/NUMERO_INIZIALE_NERI * 100.0;
-
-			opponentPawsEaten = (NUMERO_INIZIALE_BIANCHI - currentState.getNumberOf(State.Pawn.WHITE));
-			opponentPawsEaten = opponentPawsEaten/NUMERO_INIZIALE_BIANCHI * 100.0;
-
-			victory = currentState.getTurn().equals(Turn.BLACKWIN);
-
-		}
-
-		if(super.getPlayer() == Turn.WHITE){
-
-			minePawsLosts = (NUMERO_INIZIALE_BIANCHI - currentState.getNumberOf(State.Pawn.WHITE)); //TODO CONTROLLARE CHE NON SIA DISPONIBILE GIA' QUESTA CONSTANTE
-			//percentuale
-			minePawsLosts = minePawsLosts/NUMERO_INIZIALE_BIANCHI * 100.0;
-
-			opponentPawsEaten = (NUMERO_INIZIALE_NERI - currentState.getNumberOf(State.Pawn.BLACK));
-			opponentPawsEaten = opponentPawsEaten/NUMERO_INIZIALE_NERI * 100.0;
-
-			victory = currentState.getTurn().equals(Turn.WHITEWIN);
-		}
-
-		metrics.setDraw(currentState.getTurn().equals(Turn.DRAW));
-		metrics.setTime(matchTime);
-		metrics.setMinePawsLosts(minePawsLosts);
-		metrics.setOpponentPawsEaten(opponentPawsEaten);
-		metrics.setVictory(victory);
-	}
-
-	private void printMatchTime(Long startTimeMills) {
-		Long endTimeMills = System.currentTimeMillis();
-		
-		matchTime = (endTimeMills - startTimeMills);
-		
-		System.out.println("PARTITA FINITA IN __" + (endTimeMills - startTimeMills) / 1000.0 + "__ seconds");
 	}
 
 }

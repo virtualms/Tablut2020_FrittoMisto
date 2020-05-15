@@ -63,14 +63,14 @@ public class Utils {
 
                 else {
                     bytes[r][c] = 1;
+
                     //mentre ciclo salvo le coordinate (utile classe ausiliaria coord) di tutti i pezzi del mio colore che incontro
                     if (board[r][c].equals(State.Pawn.WHITE))
                         whitePieces.add(new Coord(r, c));
-//salvo il re
 
-                    //mentre ciclo salvo le coordinate (utile classe ausiliaria coord) di tutti i pezzi del mio colore che incontro
-                    if (board[r][c].equals(State.Pawn.WHITE) || board[r][c].equals(State.Pawn.KING))
-                        whitePieces.add(new Coord(r, c));
+                    //salvo il re
+                    else if (board[r][c].equals(State.Pawn.KING))
+                        whitePieces.add(0, new Coord(r, c));
                 }
             }
         }
@@ -96,6 +96,8 @@ public class Utils {
                 else {
                     bytes[1][r][c] = 1;
                     bytes[0][r][c] = 1;
+
+
                     if(board[r][c].equals(State.Pawn.BLACK))
                         blackPieces.add(new Coord(r, c));
                 }//else
@@ -130,15 +132,17 @@ public class Utils {
         /***white***/
         if (state.getTurn().equals(State.Turn.WHITE)) {
             table = w_map(state, whitePieces);
-            if(!suppressPrint) printboard(table);
+            if(!suppressPrint) {System.out.println("_____TABLE_____");printboard(table);}
 
             for(Coord c : whitePieces){
                 try {
-                    //TODO ESPLORO PRIMA LE MOSSE DEL RE, HA SENSO?
+
+                    //TODO ESPLORO PRIMA LE MOSSE DEL RE, HA SENSO? si veda w_map
                     if(whitePieces.get(0).equals(c))
                         possibleActions.addAll(0, pivoting(c, table, state.getTurn()));
                     else
                         possibleActions.addAll(pivoting(c, table, state.getTurn()));
+
                 }
                 catch (Exception e){
                     System.out.println(e.getStackTrace());
@@ -155,8 +159,8 @@ public class Utils {
             table = bytes[0];
             table_camp = bytes[1];
 
-            if(!suppressPrint)printboard(table);
-            if(!suppressPrint)printboard(table_camp);
+            if(!suppressPrint){System.out.println("_____TABLE_____");printboard(table);}
+            if(!suppressPrint){System.out.println("_____TAB_C_____");printboard(table_camp);}
             for(Coord c : blackPieces){
                 try {
                     if(isCamp(c))
@@ -215,13 +219,13 @@ public class Utils {
         List<Action> res = new LinkedList<>();
         //BitSet array = null; //vettore originale
         BitSet vec = new BitSet(9); //vettore posizioni ammissibili, usato per debug
-        int pivot = -1;
+
 
         /*****column*****/
         //array = getColumn(table, c.getCol()); --> table[i][c.getCol()]
         String from = getBox(c.getRow(), c.getCol());
 
-        pivot = c.getRow(); //pezzo da muovere
+        int pivot = c.getRow(); //pezzo da muovere
         //vec.set(pivot); //posizione pezzo
 
         //scorro la colonna verso su, mi muovo su una colonna cambiando righe
