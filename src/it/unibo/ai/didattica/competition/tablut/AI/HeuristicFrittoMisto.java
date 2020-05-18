@@ -26,7 +26,7 @@ public class HeuristicFrittoMisto implements Heuristic{
     private Coord castle;
     private List<Coord> citadels;
     private List<Coord> winPos;
-    private static double [] weight;
+    private static double [] weight = null;
     private final State.Turn playerColor; //il colore del client
 
     /****************const***********************/
@@ -59,17 +59,17 @@ public class HeuristicFrittoMisto implements Heuristic{
     }
 
     private void initWeights(){
-        weight = new double[7];
-
-        double pawnsCoef = initialBlack / initialWhite; //(16.0/9.0)
-
-        weight[KING_MANHATTAN] = 50;  //manhattan
-        weight[KING_CAPTURED_SIDES] = -100;  //king capture
-        weight[PAWS_DIFFERENCE] = 100;  //lost pawns
-        weight[PAWS_WHITE] = 100 * pawnsCoef; //white pieces (difference ?)
-        weight[VICTORY_PATH] = 300;  //victory path
-        weight[VICTORY] = 5000;  //victory
-        weight[PAWS_BLACK] = -100; //black pieces
+//        weight = new double[7];
+//
+//        double pawnsCoef = initialBlack / initialWhite; //(16.0/9.0)
+//
+//        weight[KING_MANHATTAN] = 50;  //manhattan
+//        weight[KING_CAPTURED_SIDES] = -100;  //king capture
+//        weight[PAWS_DIFFERENCE] = 100;  //lost pawns
+//        weight[PAWS_WHITE] = 100 * pawnsCoef; //white pieces (difference ?)
+//        weight[VICTORY_PATH] = 300;  //victory path
+//        weight[VICTORY] = 5000;  //victory
+//        weight[PAWS_BLACK] = -100; //black pieces
     }
 
     private void initPos(){

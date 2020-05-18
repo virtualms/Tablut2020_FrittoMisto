@@ -21,6 +21,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 
 	private static final int BLACKNUMBER = 16;
 	private static final int WHITENUMBER = 8;
+	public static final int MAX_NUM_EXCEPTIONS = 10;
 	//	private final int timeOut = 30;
 	private final int timeOut = 58;
 //	private final int currDepthLimit = 4;
@@ -64,7 +65,8 @@ public class TablutFrittoMistoClient extends TablutClient {
 
 		TablutClient client = new TablutFrittoMistoClient(args[0]);
 
-		metrics = new MetricsPartita_Genetic();
+//		metrics = new MetricsPartita_Genetic();
+		metrics = null;
 
 		client.run();
 
@@ -96,6 +98,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 	private void faiIlClient(Minmax minmax, Turn turnoMio, Turn turnoNemico, String s, String s2) {
 
 		long matchStart = System.currentTimeMillis();
+		int numeberOfException = 0;
 
 		Action action;
 		while (true) {
@@ -107,6 +110,10 @@ public class TablutFrittoMistoClient extends TablutClient {
 			} catch (Exception e) {
 				System.out.println("Errore nella lettura nuovo stato");
 				e.printStackTrace();
+				if (numeberOfException > MAX_NUM_EXCEPTIONS){
+					return;
+				}
+				numeberOfException++;
 			}
 
 			try {
@@ -152,6 +159,8 @@ public class TablutFrittoMistoClient extends TablutClient {
 	}
 
 	private void aggiornaMetrics(State currentState, long matchStart, boolean isDraw) {
+
+		metrics = new MetricsPartita_Genetic();
 
 		long endMatch = System.currentTimeMillis();
 

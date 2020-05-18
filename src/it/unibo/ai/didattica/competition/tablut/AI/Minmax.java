@@ -28,7 +28,7 @@ public final class Minmax implements Callable<Action> {
     //prints
     private static final DecimalFormat df2 = new DecimalFormat("#.##");
     private static Random rand = new Random();
-    private final boolean canPrint = true;
+    private final boolean canPrint = false;
 
     //TODO: è per limitare, eventualmente, la ricerca soltanto al primo livello
     private boolean iterative;
