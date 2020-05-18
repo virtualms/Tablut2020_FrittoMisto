@@ -12,28 +12,30 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
 
+/**
+ *
+ * @author E.Cerulo, V.M.Stanzione
+ *
+ */
 
 public final class Minmax implements Callable<Action> {
 
-    //TODO: Controllare, per avere conferma, che questo executor è quello più performante.
+    /***executor***/
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    public static Game game;
+    /***logic***/
     protected int currDepthLimit;
-    private State.Turn player;
-    private Utils u;
+    private final State.Turn player;
+    private final Utils u;
     private final List<String> citadels;
     private final Heuristic heuristic;
 
-    //prints
+    /***prints***/
     private static final DecimalFormat df2 = new DecimalFormat("#.##");
-    private static Random rand = new Random();
+    private static final Random rand = new Random();
     private final boolean canPrint = true;
 
-    //TODO: è per limitare, eventualmente, la ricerca soltanto al primo livello
-    private boolean iterative;
-
-    //  Come parametri per la call
+    // Come parametri per la call
     private State currentState;
 
     //risultati
@@ -41,14 +43,10 @@ public final class Minmax implements Callable<Action> {
     private static List<Action> possibleActions;
 
 
-
-
-//     Può essere inserito oppure no, vediamo come si comporta il timeout
-    public Minmax(Game game, int currDepthLimit, State.Turn player, boolean iterative) {
-        this.game = game;
+    /***costruttore***/
+    public Minmax(int currDepthLimit, State.Turn player) {
         this.currDepthLimit = currDepthLimit;
         this.player = player;
-        this.iterative = iterative;
         this.u = new Utils(true);
         this.heuristic = new HeuristicFrittoMisto(player, currDepthLimit);
 
@@ -73,6 +71,9 @@ public final class Minmax implements Callable<Action> {
         this.citadels.add("e8");
     }
 
+
+
+    /***MAKE DECISION***/
     public Action makeDecision(int timeOut, State stato) throws IOException {
 
         currentState = stato;
@@ -88,17 +89,7 @@ public final class Minmax implements Callable<Action> {
             System.out.println("Selected: {" + result.toString() + "}");
         } catch (TimeoutException e) {
 
-            //importante altrimenti il thread che si occupa della call() continua ad eseguire
             boolean cancellato = risultato.cancel(true);
-
-
-            //Questo è il metodo che fa terminare il thread che lavora sui callable.
-            //Decommentato altrimenti non potrebbero esserci chiamate successive di questo metodo.
-            //In alternativa si potrebbe instanziare un ExecutorService ad ogni chiamata, ma per me è inutile,
-            //inoltre in questo modo si ha sempre un pool di thread pronti ad eseguire. Se venisse instanziato ogni volta,
-            //i thread verrebbero inizializzati ogni volta con perdita di prestazioni.
-            //executorService.shutdownNow();
-
             System.out.println("####### time_out scattato #######");
 
             if(!possibleActions.isEmpty())
@@ -119,8 +110,10 @@ public final class Minmax implements Callable<Action> {
     @Override
     public Action call() throws Exception {
 
+        //valore del risultato
         double resultValue = Double.NEGATIVE_INFINITY;
 
+        //azioni iniziali
         List<Action> azioni = u.getSuccessors(currentState);
         Collections.shuffle(azioni);
 
@@ -132,11 +125,9 @@ public final class Minmax implements Callable<Action> {
         if(canPrint) System.out.println("----------------------------------------------------------------------------------");
         for (Action action : azioni) {
 
-            //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
             double value = minValue(this.checkMove(currentState.clone(), action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0);
 
-            //TODO: POTREBBE BASTARE SOLO NEL CICLO DELLA FUNZIONE call();
-            // importante che sia prima dell' if (value > resultValue)  in quanto potrebbe ritornare un valore sballato (vedi minValue e maxValue)
+            // importante che sia prima dell' if (value > resultValue)
             if(Thread.interrupted()){
                 System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----call()");
                 gestisciTerminazione();
@@ -192,10 +183,9 @@ public final class Minmax implements Callable<Action> {
 //                return true;
 //            }
 
+    /***max***/
     public double maxValue(State state, double alpha, double beta, int depth) throws Exception{
 
-        //TODO: Lo metto anche qui. Posso ritornare qualsiasi cosa, tanto al ritorno di questa funzione
-        // ci sarà immediatamente un altro controllo sull'interrupted.
         if(Thread.interrupted()){
             System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----maxValue()");
             gestisciTerminazione();
@@ -210,7 +200,6 @@ public final class Minmax implements Callable<Action> {
         double value = Double.NEGATIVE_INFINITY;
 
         for (Action action : u.getSuccessors(state)) {
-            //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
             value = Math.max(value, minValue(this.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value >= beta)
                 return value;
@@ -223,10 +212,9 @@ public final class Minmax implements Callable<Action> {
         Thread.currentThread().stop();
     }
 
+    /***min***/
     public double minValue(State state, double alpha, double beta, int depth) throws Exception{
 
-        //TODO: Lo metto anche qui. Posso ritornare qualsiasi cosa, tanto al ritorno di questa funzione
-        // ci sarà immediatamente un altro controllo sull'interrupted.
         if(Thread.interrupted()){
             System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----minValue()");
             gestisciTerminazione();
@@ -240,8 +228,6 @@ public final class Minmax implements Callable<Action> {
         double value = Double.POSITIVE_INFINITY;
 
         for (Action action : u.getSuccessors(state)) {
-
-            //TODO DA CONTROLLARE CHECKMOVE. è NECESSARIA STA .clone() CONTINUA? CI POTREBBE FAR PERDERE PARECCHIO TEMPO
             value = Math.min(value, maxValue(this.checkMove(state.clone(), action), alpha, beta, depth + 1));
             if (value <= alpha)
                 return value;

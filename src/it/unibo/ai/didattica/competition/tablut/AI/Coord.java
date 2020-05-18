@@ -2,6 +2,12 @@ package it.unibo.ai.didattica.competition.tablut.AI;
 
 import java.util.Objects;
 
+/**
+ *
+ * @author E.Cerulo, V.M.Stanzione
+ *
+ */
+
 public class Coord {
 
     private int row;

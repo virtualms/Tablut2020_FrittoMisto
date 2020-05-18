@@ -15,42 +15,31 @@ import java.net.UnknownHostException;
 
 /**
  * 
- * @author
+ * @author E.Cerulo, V.M.Stanzione
  *
  */
 public class TablutFrittoMistoClient extends TablutClient {
 
-//	private final int timeOut = 30;
-	private final int timeOut = 58;
+	private final int timeOut;
 //	private final int currDepthLimit = 4;
 	private final int currDepthLimit = 3;
-	private Game game;
 	private static final String NAME = "FrittoMisto";
 
-//	TODO: Presi dal random. Eventualmente da sistemare
-//	public TablutFrittoMistoClient(String player, String name, int gameChosen, int timeout, String ipAddress) throws UnknownHostException, IOException {
-//		super(player, name, timeout, ipAddress);
-//		game = gameChosen;
-//	}
-//
-//	public TablutFrittoMistoClient(String player, String name, int timeout, String ipAddress) throws UnknownHostException, IOException {
-//		this(player, name, 4, timeout, ipAddress);
-//	}
-//
-//	public TablutFrittoMistoClient(String player, int timeout, String ipAddress) throws UnknownHostException, IOException {
-//		this(player, "random", 4, timeout, ipAddress);
-//	}
-//
-//	public TablutFrittoMistoClient(String player) throws UnknownHostException, IOException {
-//		this(player, "random", 4, 60, "localhost");
-//	}
 
+	/***costruttori***/
+	//gli argomenti devono essere il ruolo (White or Black), il timeout in secondi, e l'indirizzo IP del server.
+	public TablutFrittoMistoClient(String player, int timeout, String ipAddress) throws UnknownHostException, IOException {
+		super(player, NAME , timeout, ipAddress);
+		this.timeOut = timeout;
+	}
 
 	public TablutFrittoMistoClient(String player) throws IOException {
 		super(player, NAME);
-		this.game = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
+		this.timeOut = 58;
 	}
 
+
+	/***main***/
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
 
 		if (args.length == 0) {
@@ -59,7 +48,13 @@ public class TablutFrittoMistoClient extends TablutClient {
 		}
 		System.out.println("Selected this: " + args[0]);
 
-		TablutClient client = new TablutFrittoMistoClient(args[0]);
+		TablutClient client = null;
+		if(args.length == 1)
+			client = new TablutFrittoMistoClient(args[0]);
+		else if(args.length == 3)
+			//gli argomenti devono essere il ruolo (White or Black), il timeout in secondi, e l'indirizzo IP del server.
+			client = new TablutFrittoMistoClient(args[0].toUpperCase(), Integer.parseInt(args[1]), args[2]);
+		else {System.out.println("Usage: role timeout IP ; role"); System.exit(1);}
 
 		client.run();
 
@@ -69,7 +64,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 	public void run() {
 		System.out.println("You are player " + this.getPlayer().toString() + "!");
 		Action action;
-		Minmax minmax = new Minmax(game, currDepthLimit, getPlayer(), true);
+		Minmax minmax = new Minmax(currDepthLimit, getPlayer());
 
 		try {
 			this.declareName();
@@ -78,8 +73,6 @@ public class TablutFrittoMistoClient extends TablutClient {
 		}
 
 		if (this.getPlayer() == Turn.WHITE) {
-			//TODO. INSERITO PER NON AVERE CODICE DIVERSO FRA LE PROVE DEL NERO E DEL BIANCO. UNA VOLTA CAPITO PERCHè C'è
-			// QUELL'ERRORE CON DEPTH 4 POSSIAMO ANCHE ELIMINARE IL METODO faiIlClient
 			faiIlClient(minmax, Turn.WHITE, Turn.BLACK, "YOU WIN!", "YOU LOSE!");
 			return;
 		} else {
@@ -105,8 +98,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 			try {
 				if (this.getCurrentState().getTurn().equals(turnoMio)) {
 
-					/*****AGGIUNTE*****/
-
+					/*****ACTION*****/
 					long start = System.currentTimeMillis();
 
 					action = minmax.makeDecision(timeOut, getCurrentState().clone());
@@ -114,7 +106,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 
 					long end = System.currentTimeMillis();
 					System.out.println("Ci ho messo " + (end - start) + " millisecs");
-					/*******FINE*******/
+					/**************/
 
 				} else if (this.getCurrentState().getTurn().equals(turnoNemico)) {
 					System.out.println("Waiting for your opponent move... ");

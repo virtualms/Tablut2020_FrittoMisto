@@ -26,11 +26,11 @@ public class ClientPerPesi {
 
         weights[HeuristicFrittoMisto.KING_MANHATTAN] = manhattanKing;
         weights[HeuristicFrittoMisto.KING_CAPTURED_SIDES] = kingSidesThreatened;
-        weights[HeuristicFrittoMisto.PAWS_DIFFERENCE] = pawnsDifference;
-        weights[HeuristicFrittoMisto.PAWS_WHITE] = whitePaws;
+        weights[HeuristicFrittoMisto.PAWNS_DIFFERENCE] = pawnsDifference;
+        weights[HeuristicFrittoMisto.PAWNS_WHITE] = whitePaws;
         weights[HeuristicFrittoMisto.VICTORY_PATH] = victoryPath;
         weights[HeuristicFrittoMisto.VICTORY] = victory;
-        weights[HeuristicFrittoMisto.PAWS_BLACK] = blackPaws;
+        weights[HeuristicFrittoMisto.PAWNS_BLACK] = blackPaws;
         HeuristicFrittoMisto.setWeight(weights);
 
 //        String[] array = new String[]{player};

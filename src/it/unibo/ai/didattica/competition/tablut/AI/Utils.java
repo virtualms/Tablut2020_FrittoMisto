@@ -137,7 +137,7 @@ public class Utils {
             for(Coord c : whitePieces){
                 try {
 
-                    //TODO ESPLORO PRIMA LE MOSSE DEL RE, HA SENSO? si veda w_map
+                    //Mosse del re inserite prima
                     if(whitePieces.get(0).equals(c))
                         possibleActions.addAll(0, pivoting(c, table, state.getTurn()));
                     else

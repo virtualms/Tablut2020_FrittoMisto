@@ -9,32 +9,44 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ *
+ * @author E.Cerulo, V.M.Stanzione
+ *
+ */
+
 public class HeuristicFrittoMisto implements Heuristic{
 
     /***cost***/
     public static final int KING_MANHATTAN = 0;
     public static final int KING_CAPTURED_SIDES = 1;
-    public static final int PAWS_DIFFERENCE = 2;
-    public static final int PAWS_WHITE = 3;
-    public static final int PAWS_BLACK = 6;
+    public static final int PAWNS_DIFFERENCE = 2;
+    public static final int PAWNS_WHITE = 3;
+    public static final int PAWNS_BLACK = 6;
     public static final int VICTORY = 5;
     public static final int VICTORY_PATH = 4;
 
-    private int depthLimit;
+    private final int depthLimit;
     private double initialBlack;
     private double initialWhite;
     private Coord castle;
     private List<Coord> citadels;
     private List<Coord> winPos;
     private static double [] weight;
+
+    /***color***/
     private final State.Turn playerColor; //il colore del client
+    private final double color;
 
     /****************WIN***********************/
 
-    public HeuristicFrittoMisto(int initialBlack, int initialWhite, State.Turn playerColor) {
+    public HeuristicFrittoMisto(int initialBlack, int initialWhite, State.Turn playerColor, int depthLimit) {
         this.initialBlack = initialBlack;
         this.initialBlack = initialWhite;
         this.playerColor = playerColor;
+        this.depthLimit = depthLimit;
+
+        this.color = ((playerColor == State.Turn.WHITE || playerColor == State.Turn.WHITEWIN) ? 1 : -1);
 
         initWeights();
         initPos();
@@ -45,6 +57,8 @@ public class HeuristicFrittoMisto implements Heuristic{
         this.initialBlack = 16;
         this.playerColor = playerColor;
         this.depthLimit = depthLimit;
+
+        this.color = ((playerColor == State.Turn.WHITE || playerColor == State.Turn.WHITEWIN) ? 1 : -1); //eval fatta su bianco, per il nero è a specchio (somma zero)
 
         initWeights();
         initPos();
@@ -57,15 +71,15 @@ public class HeuristicFrittoMisto implements Heuristic{
     private void initWeights(){
         weight = new double[7];
 
-        double pawnsCoef = initialBlack / initialWhite; //(16.0/9.0)
+        double pawnsCoef = (initialBlack - 2.0) / initialWhite; //(16.0/9.0)
 
         weight[KING_MANHATTAN] = 50;  //manhattan
         weight[KING_CAPTURED_SIDES] = -100;  //king capture
-        weight[PAWS_DIFFERENCE] = 100;  //lost pawns
-        weight[PAWS_WHITE] = 100 * pawnsCoef; //white pieces (difference ?)
+        weight[PAWNS_DIFFERENCE] = 100;  //lost pawns
+        weight[PAWNS_WHITE] = 100 * pawnsCoef; //white pieces (difference ?)
         weight[VICTORY_PATH] = 300;  //victory path
         weight[VICTORY] = 5000;  //victory
-        weight[PAWS_BLACK] = -100; //black pieces
+        weight[PAWNS_BLACK] = -100; //black pieces
     }
 
     private void initPos(){
@@ -118,12 +132,13 @@ public class HeuristicFrittoMisto implements Heuristic{
         this.citadels.add(new Coord(5, 0));
     }
 
-    /*****************************************************/
+
+    /*********************eval********************************/
     public double eval(State state, int depth){
 
-        int color = ((playerColor == State.Turn.WHITE || playerColor == State.Turn.WHITEWIN) ? 1 : -1); //eval fatta su bianco, per il nero è a specchio (somma zero)
+        //double color = ((playerColor == State.Turn.WHITE || playerColor == State.Turn.WHITEWIN) ? 1 : -1);
 
-        //Liste globali (?) l'assunto che heuristic non sia chiamata più volte in contemporanea è giusto?
+        //pawns
         List<List<Coord>> pieces = state.getPieces();
 
         List<Coord> blackPieces = pieces.get(state.BLACK);
@@ -132,11 +147,11 @@ public class HeuristicFrittoMisto implements Heuristic{
 
         double V =  weight[KING_MANHATTAN]      * kingManhattan(king)                                   +
                     weight[KING_CAPTURED_SIDES] * kingCapture(king, blackPieces)                        +
-                    weight[PAWS_DIFFERENCE]     * lostPaws(blackPieces, whitePieces, state.getTurn())   +
-                    weight[PAWS_WHITE]          * whitePieces.size()                                    +
+                    //weight[PAWNS_DIFFERENCE]    * lostPaws(blackPieces, whitePieces, state.getTurn())   +
+                    weight[PAWNS_WHITE]         * whitePieces.size()                                    +
                     weight[VICTORY_PATH]        * victoryPaths(king, blackPieces, whitePieces)          +
                     weight[VICTORY]             * winCondition(state.getTurn(), depth)                  +
-                    weight[PAWS_BLACK]          * blackPieces.size();
+                    weight[PAWNS_BLACK]         * blackPieces.size();
 
         return V * color;
     }
@@ -145,7 +160,7 @@ public class HeuristicFrittoMisto implements Heuristic{
 
 
 
-    /*-*********************FUNC*************************/
+    /**********************FUNC*************************/
     /**0**/
     private double kingManhattan(Coord king){
         //6 massima distanza da win position
@@ -189,7 +204,6 @@ public class HeuristicFrittoMisto implements Heuristic{
 
         double paths=0;
         Optional<Coord> o;
-        //servono a "riutilizzare" uno stream
         Supplier<Stream<Coord>> sup1, sup2;
 
         sup1 = () -> Stream.concat(blackPieces.stream(), whitePieces.stream());
@@ -255,7 +269,7 @@ public class HeuristicFrittoMisto implements Heuristic{
         return 0;
     }
 
-    //bonus se le distanza da root è minima
+    //bonus su distanza da root
     private double depthBonus(int depth){
         //return depth == 0 ? 2 : 1;
         return (double)(depthLimit - depth)/(double)depthLimit + 1.0;
@@ -263,7 +277,4 @@ public class HeuristicFrittoMisto implements Heuristic{
 
     /**6**/
     //pezzi neri
-
-
-    /******************************************************************/
 }
