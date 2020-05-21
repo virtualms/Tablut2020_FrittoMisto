@@ -63,10 +63,10 @@ public class TablutFrittoMistoClient extends TablutClient {
 			client = new TablutFrittoMistoClient(args[0]);
 		else if(args.length == 3)
 			//gli argomenti devono essere il ruolo (White or Black), il timeout in secondi, e l'indirizzo IP del server.
-			client = new TablutFrittoMistoClient(args[0].toUpperCase(), Integer.parseInt(args[1]), args[2]);
+			client = new TablutFrittoMistoClient(args[0].toUpperCase(), Math.round(Float.parseFloat(args[1])) - 2, args[2]);
 		else if (args.length == 4)
 			//gli argomenti devono essere il ruolo (White or Black), il timeout in secondi, e l'indirizzo IP del server, depth
-			client = new TablutFrittoMistoClient(args[0].toUpperCase(), Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]));
+			client = new TablutFrittoMistoClient(args[0].toUpperCase(), Math.round(Float.parseFloat(args[1])) - 2, args[2], Integer.parseInt(args[3]));
 		else {System.out.println("Usage: role timeout IP ; role"); System.exit(1);}
 
 		client.run();
