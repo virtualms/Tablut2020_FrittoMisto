@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
+import java.text.ParseException;
 
 /**
  * 
@@ -22,7 +23,7 @@ public class TablutFrittoMistoClient extends TablutClient {
 
 	private final int timeOut;
 //	private final int currDepthLimit = 4;
-	private final int currDepthLimit = 3;
+	private final int currDepthLimit;
 	private static final String NAME = "FrittoMisto";
 
 
@@ -31,11 +32,19 @@ public class TablutFrittoMistoClient extends TablutClient {
 	public TablutFrittoMistoClient(String player, int timeout, String ipAddress) throws UnknownHostException, IOException {
 		super(player, NAME , timeout, ipAddress);
 		this.timeOut = timeout;
+		currDepthLimit = 4;
+	}
+
+	public TablutFrittoMistoClient(String player, int timeout, String ipAddress, int depth) throws UnknownHostException, IOException {
+		super(player, NAME , timeout, ipAddress);
+		this.timeOut = timeout;
+		this.currDepthLimit = depth;
 	}
 
 	public TablutFrittoMistoClient(String player) throws IOException {
 		super(player, NAME);
 		this.timeOut = 58;
+		currDepthLimit = 4;
 	}
 
 
@@ -50,10 +59,14 @@ public class TablutFrittoMistoClient extends TablutClient {
 
 		TablutClient client = null;
 		if(args.length == 1)
+			//COLORE
 			client = new TablutFrittoMistoClient(args[0]);
 		else if(args.length == 3)
 			//gli argomenti devono essere il ruolo (White or Black), il timeout in secondi, e l'indirizzo IP del server.
 			client = new TablutFrittoMistoClient(args[0].toUpperCase(), Integer.parseInt(args[1]), args[2]);
+		else if (args.length == 4)
+			//gli argomenti devono essere il ruolo (White or Black), il timeout in secondi, e l'indirizzo IP del server, depth
+			client = new TablutFrittoMistoClient(args[0].toUpperCase(), Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]));
 		else {System.out.println("Usage: role timeout IP ; role"); System.exit(1);}
 
 		client.run();

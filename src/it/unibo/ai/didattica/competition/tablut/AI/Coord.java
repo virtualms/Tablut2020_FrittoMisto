@@ -34,6 +34,7 @@ public class Coord {
         this.col = col;
     }
 
+
     /**************utility*****************************/
     public int distanceFrom(Coord other){
         return Math.abs(this.getRow() - other.getRow()) + Math.abs(this.getCol() - other.getCol());

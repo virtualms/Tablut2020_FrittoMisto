@@ -27,8 +27,8 @@ public class HeuristicFrittoMisto implements Heuristic{
     public static final int VICTORY_PATH = 4;
 
     private final int depthLimit;
-    private double initialBlack;
-    private double initialWhite;
+    private final double initialBlack;
+    private final double initialWhite;
     private Coord castle;
     private List<Coord> citadels;
     private List<Coord> winPos;
@@ -42,7 +42,7 @@ public class HeuristicFrittoMisto implements Heuristic{
 
     public HeuristicFrittoMisto(int initialBlack, int initialWhite, State.Turn playerColor, int depthLimit) {
         this.initialBlack = initialBlack;
-        this.initialBlack = initialWhite;
+        this.initialWhite = initialWhite;
         this.playerColor = playerColor;
         this.depthLimit = depthLimit;
 
@@ -71,8 +71,9 @@ public class HeuristicFrittoMisto implements Heuristic{
     private void initWeights(){
         weight = new double[7];
 
-        double pawnsCoef = (initialBlack - 2.0) / initialWhite; //(16.0/9.0)
+        //double pawnsCoef = (initialBlack) / initialWhite; //(16.0/9.0)
 
+        /*
         weight[KING_MANHATTAN] = 50;  //manhattan
         weight[KING_CAPTURED_SIDES] = -100;  //king capture
         weight[PAWNS_DIFFERENCE] = 100;  //lost pawns
@@ -80,6 +81,16 @@ public class HeuristicFrittoMisto implements Heuristic{
         weight[VICTORY_PATH] = 300;  //victory path
         weight[VICTORY] = 5000;  //victory
         weight[PAWNS_BLACK] = -100; //black pieces
+        */
+
+        //POST GENETIC
+        weight[KING_MANHATTAN] = 42;  //manhattan
+        weight[KING_CAPTURED_SIDES] = -147;  //king capture
+        weight[PAWNS_DIFFERENCE] = -22;  //lost pawns
+        weight[PAWNS_WHITE] = 250; //white pieces (difference ?)
+        weight[VICTORY_PATH] = 195;  //victory path
+        weight[VICTORY] = 5000;  //victory
+        weight[PAWNS_BLACK] = -164; //black pieces
     }
 
     private void initPos(){

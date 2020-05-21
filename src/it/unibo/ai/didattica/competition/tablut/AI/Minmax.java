@@ -131,7 +131,7 @@ public final class Minmax implements Callable<Action> {
             if(Thread.interrupted()){
                 System.out.println(Thread.currentThread() + "___ : Mi è stato chiesto di fermarmi----call()");
                 gestisciTerminazione();
-                System.out.println(Thread.currentThread() + "___ : Mi sono fermato----call()");
+                System.out.println(Thread.currentThread() + "___ : Mi sono fermato--in--call()");
                 return possibleActions.get(rand.nextInt(possibleActions.size()));
             }
 
