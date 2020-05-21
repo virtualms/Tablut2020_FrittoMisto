@@ -8,7 +8,7 @@ All the jars are in the *jars* directory.
 You can run the player with: 
 
 ```
-java -jar "NoiRestiamoAChesa(ni).jar" <role> <timer> <ip>
+java -jar "FrittoMisto.jar" <role> <timer> <ip>
 <role> "WHITE" or "BLACK" 
 <time> timer in secods (60s max, timer <59 recommended)
 <ip> ip of the server
