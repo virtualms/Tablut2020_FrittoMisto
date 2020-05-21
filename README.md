@@ -17,11 +17,11 @@ java -jar "FrittoMisto.jar" <role> <timer> <ip>
 To run the player from the VM, in /tablut run:
 ```
 ./runmyplayer <role> <time> <ip>
-<role> "white" or "black" 
-<time> time in secods (60 recommended)
-<ip> ip of the machine where the server has been started
+<role> "WHITE" or "BLACK" 
+<time> time in secods (60 recommended, timer <59 recommended)
+<ip> ip of the server
 ```
 
 ## Authors
-E.Cerulo
+E.Cerulo, 
 V.M.Stanzione
