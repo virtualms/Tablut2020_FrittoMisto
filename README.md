@@ -2,7 +2,7 @@
 Project for the course of IA, at University of Bologna. The project realize a player 
 for of an ancient Nordic strategy board game: *Tablut*. The project is written in Java.
 
-#Usage
+# Usage
 All the jars are in the *jars* directory.
 
 You can run the player with: 
@@ -22,6 +22,6 @@ To run the player from the VM, in /tablut run:
 <ip> ip of the machine where the server has been started
 ```
 
-##Authors
+## Authors
 E.Cerulo
 V.M.Stanzione
