@@ -1,6 +1,6 @@
 # Tablut2020_FrittoMisto
-Project for the course of IA, at University of Bologna. The project realize a player 
-for of an ancient Nordic strategy board game: *Tablut*. The project is written in Java.
+Project for the course of IA, at University of Bologna. The project realizes a player 
+for an ancient Nordic strategy board game: *Tablut*. The project is written in Java.
 
 # Usage
 All the jars are in the *jars* directory.
