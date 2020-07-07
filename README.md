@@ -1,6 +1,8 @@
 # Tablut2020_FrittoMisto
-Project for the course of IA, at University of Bologna. The project realizes a player 
+This repository contains the project for the game challenge for the AI course at University of Bologna. The project realizes a player 
 for an ancient Nordic strategy board game: *Tablut*. The project is written in Java.
+
+(1st place)
 
 # Usage
 All the jars are in the *jars* directory.
